@@ -1,0 +1,137 @@
+generated: '2026-09-19'
+method: searched
+source: https://renoolab.fr/mcp/
+sources:
+- https://mcp.renoolab.fr/mcp (tools/list annotations, schemas and server instructions, 2026-09-19)
+- https://renoolab.fr/mcp/ and https://renoolab.fr/mcp/index.md
+- https://github.com/mehdimicra/renoolab-mcp (README "Search contracts")
+- https://renoolab.fr/privacy/
+- https://renoolab.fr/cgu/ (§12 Résiliation, §15 Accès depuis un assistant IA)
+- https://renoolab.fr/suppression-compte/
+description: >-
+  Cross-cutting semantics of RenooLab's agent surfaces (MCP server, A2A agent, WebMCP page tools). There is no
+  REST API, so the conventions are those of JSON-RPC tools: how a tool signals that it needs more input, how
+  reads and writes are separated, what protects a write from being replayed, and what can be undone.
+api_style: MCP (JSON-RPC 2.0 over streamable HTTP, protocol 2025-06-18) at https://mcp.renoolab.fr/mcp; A2A 1.0 JSON-RPC at https://a2a.renoolab.fr/a2a; WebMCP tools registered in-page on renoolab.fr
+locale: fr-FR - tool names, descriptions, enum values (trade labels such as "Couverture/Toiture") and result text are French; the server instructions and skills are French; the registry entry and README are English
+
+authentication:
+  scheme: none for reads; OAuth 2.1 bearer (authorization code + PKCE S256, dynamic client registration) for the two write tools
+  account_required: false
+  detail: authentication/renoolab-fr-authentication.yml
+
+idempotency:
+  supported: false
+  coverage: none
+  mechanism: null
+  detail: >-
+    No idempotency key, request id or replay-safe write contract is documented or declared. The two read tools
+    carry idempotentHint true and the two write tools idempotentHint false in their MCP annotations. What exists
+    instead is server-side DUPLICATE CONTROL: "quotas atomiques et anti-doublon" - at most one contact request
+    to the same artisan per 24 hours per e-mail/phone, and per-actor caps on profile creation - which prevents
+    some double-fires but is a business rule, not a client-controllable idempotency mechanism (a second
+    identical contacter_artisan call inside the window is refused, not replayed). The write tools also require
+    an explicit user confirmation step before the call, per the server instructions and the CGU.
+  annotations:
+    rechercher_artisans: {readOnlyHint: true, idempotentHint: true}
+    rechercher_chantier: {readOnlyHint: true, idempotentHint: true}
+    contacter_artisan: {readOnlyHint: false, destructiveHint: true, idempotentHint: false}
+    creer_profil_artisan: {readOnlyHint: false, destructiveHint: true, idempotentHint: false}
+
+dry_run_mode:
+  supported: false
+  grade: none
+  detail: >-
+    No dry-run, preview or test mode. execution.taskSupport is "forbidden" on all four tools (synchronous only).
+    The provider's own install guide says to test only the read tools and never call the write tools during
+    installation testing; the SECURITY.md forbids creating contact requests or accounts for testing without
+    written authorization. The confirmation-before-write rule is a human-in-the-loop gate, not a rehearsal.
+
+reversibility:
+  grade: documented
+  detail: >-
+    Of the two write surfaces, one has a documented reversal path and the other has none. Graded `documented`
+    overall (0.4 credit tier) rather than `verified`, because the contact request cannot be withdrawn by the
+    caller and no reversal window is stated for it.
+  writes:
+  - operation: contacter_artisan
+    effect: places a private contact request (kind contact_pending) in RenooLab's moderation queue for one selected RenooLab profile or Google Maps Place ID; forwarded to the professional only after human validation
+    reversal: none
+    window: null
+    detail: >-
+      No cancel/withdraw tool or documented channel exists. The privacy policy states a pending request "n'est
+      pas supprimée silencieusement et reste conservée jusqu'à sa modération" and that identifying fields of
+      processed agentic requests are erased after 90 days; the only stop is RenooLab's own moderation. An
+      external (Google Maps) target creates a single request for manual handling and triggers no alternative
+      contact.
+    docs: https://renoolab.fr/privacy/
+  - operation: creer_profil_artisan
+    effect: creates an INACTIVE, non-public professional profile and e-mails the professional an activation link (kind signup_created)
+    reversal: account deletion (in-app Paramètres > Supprimer mon compte, or by e-mail to support@renoolab.fr from the account address with subject "Suppression de compte")
+    reversal_operation_id: null (no MCP tool; performed by the profile holder through the app or support)
+    window: '"à tout moment" (CGU §12); e-mail requests handled "sous 7 jours ouvrés"; an assistant-created profile that is never activated, never logged into and inactive is deleted automatically "à partir de 30 jours" (privacy policy §5)'
+    detail: >-
+      Two natural reversals: not activating (the profile stays invisible and is purged from 30 days), or
+      deleting the account after activation, which the CGU allow at any time and which deletes profile, photos,
+      messages and reviews authored (reviews received stay, anonymised). Deletion is immediate in-app; the
+      e-mail path is manual.
+    docs: https://renoolab.fr/suppression-compte/
+  reads_are_side_effect_free: true
+  reads_note: The two search tools and the A2A skill are read-only by annotation and by the CGU/privacy text; the only trace is a pseudonymous funnel event (profile_view / contact_open / contact_submitted), kept 12 months.
+
+clarification_pattern:
+  detail: >-
+    Instead of erroring, both search tools return a structured clarification result. rechercher_artisans and
+    rechercher_chantier answer kind "search_needs_input" with required_input naming what is missing (a commune,
+    a postal code or department for a homonymous commune, or - for rechercher_chantier - metiers_prioritaires
+    with metiers_recus when more than six trades were sent). The client is expected to ask the user and retry
+    the same tool. A zero-result search is a valid business result (kind artisan_results with an empty list),
+    explicitly distinct from a technical failure.
+  input_disambiguation: code_postal (^\d{5}$) or departement (01-95, 2A, 2B, 3-digit DOM) on both search tools
+
+pagination:
+  style: none
+  detail: Fixed result caps - up to 5 artisans (or 5 attributed external listings) per single-trade search, up to 3 complete solutions plus a minimal combination for a project search; no cursor, page or offset parameters.
+
+result_limits:
+  single_trade_radius_km: 30
+  multi_trade_radius_km: 50
+  max_profiles_per_search: 5
+  max_complete_solutions: 3
+  max_trades_per_project: 17 in the schema; the server asks the user to pick at most 6 priority trades when more are sent
+
+field_expansion: {supported: false}
+metadata: {supported: false}
+
+request_tracing:
+  detail: >-
+    A2A errors carry data.request_id (UUID) in the JSON-RPC error object. No request-id header is documented on
+    the MCP side; the session is identified by the mcp-session-id header (exposed via
+    access-control-expose-headers). Tools accept an optional tracking object {channel: direct|a2a, client,
+    discovery} for pseudonymous funnel attribution - it is telemetry, not correlation.
+
+versioning:
+  detail: Unversioned endpoint URL; server version in serverInfo (1.4.0) and the MCP Registry; MCP protocol version negotiated at initialize (2025-06-18). See lifecycle/renoolab-fr-lifecycle.yml.
+
+error_envelope:
+  shape: JSON-RPC 2.0 error object {code, message, data?}
+  observed: [MCP -32601 Method not found, A2A -32009 "Version A2A invalide." with data.request_id]
+  detail: errors/renoolab-fr-problem-types.yml
+
+rate_limit_signaling:
+  headers: none documented
+  detail: rate-limits/renoolab-fr-rate-limits.yml - documented quotas on contacts and profile creation; exhaustion behaviour is a tool error, format unpublished.
+
+data_handling_rules_for_agents:
+- Use the user's REAL contact details (name, French 06/07 mobile, e-mail); the professional calls back on them (llms.txt, MCP docs).
+- Never copy widget_previews or image URLs into the model reply; the MCP Apps widget renders them.
+- Exactly one target on contacter_artisan - artisan_id OR external_place_id, never both (enforced by a JSON Schema oneOf).
+- Search before contacting; recap the target and the request and obtain explicit confirmation before any write (server instructions, CGU §15).
+- Do not split a multi-trade project into several rechercher_artisans calls; call rechercher_chantier once.
+
+related:
+  authentication: authentication/renoolab-fr-authentication.yml
+  errors: errors/renoolab-fr-problem-types.yml
+  lifecycle: lifecycle/renoolab-fr-lifecycle.yml
+  rate_limits: rate-limits/renoolab-fr-rate-limits.yml
+  data_model: data-model/renoolab-fr-data-model.yml

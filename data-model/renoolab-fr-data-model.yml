@@ -1,0 +1,308 @@
+generated: '2026-09-19'
+method: derived
+derived_from: mcp/renoolab-fr-mcp-tools-list.json
+docs:
+- https://renoolab.fr/llms.txt
+- https://github.com/mehdimicra/renoolab-mcp
+summary: >-
+  Entity graph derived from the JSON Schema inputSchema/outputSchema the live MCP tools/list publishes (there is
+  no OpenAPI). One core entity (Artisan) is returned by both searches and targeted by the contact write; the profile
+  write creates a not-yet-active Artisan; trades are a closed French enum; communes are the geographic key and are
+  disambiguated by postal code or department. No subway/ render exists.
+entity_count: 8
+entities:
+- name: Artisan
+  description: >-
+    A RenooLab professional profile as returned by both search tools (public fields only; private contact details
+    are never exposed to the model).
+  id_field: artisan_id (UUID)
+  source: mcp/renoolab-fr-mcp-tools-list.json#rechercher_artisans.outputSchema.artisans[]
+  fields:
+  - name: artisan_id
+    type: string
+    format: uuid
+    required: true
+  - name: nom
+    type: string
+    required: true
+  - name: ville
+    type: string
+    required: true
+  - name: metiers
+    type: array
+    required: true
+  - name: note
+    type: number|null
+    required: true
+  - name: nb_avis
+    type: integer
+    required: true
+  - name: distance_km
+    type: number|null
+    required: true
+  - name: avatar_url
+    type: string|null
+    required: true
+  - name: nb_photos
+    type: integer
+    required: true
+  - name: verifie
+    type: boolean
+    required: true
+  - name: medaille
+    type: string
+    enum:
+    - none
+    - bronze
+    - silver
+    - gold
+    required: true
+  - name: profile_url
+    type: string
+    format: uri
+    required: true
+  - name: contact_url
+    type: string
+    format: uri
+    required: true
+- name: ExternalListing
+  description: >-
+    An attributed Google Maps listing returned by rechercher_artisans (kind external_grounded_results) when no RenooLab
+    member is available; only the Place ID is persisted if contacted.
+  id_field: place_id
+  source: mcp/renoolab-fr-mcp-tools-list.json#rechercher_artisans.outputSchema.external_results[]
+  fields:
+  - name: source
+    type: string
+    const: google_maps
+    required: true
+  - name: citation_index
+    type: integer
+    required: true
+  - name: place_id
+    type: string
+    required: true
+  - name: google_maps_url
+    type: string
+    format: uri
+    required: true
+  - name: attribution
+    type: object
+    required: true
+  - name: contact_url
+    type: string
+    format: uri
+    required: true
+- name: ChantierSolution
+  description: >-
+    One complete provider for a multi-trade project: an Artisan plus the basis on which it covers the requested
+    trades.
+  source: mcp/renoolab-fr-mcp-tools-list.json#rechercher_chantier.outputSchema.solutions_completes[]
+  fields:
+  - name: artisan
+    type: object
+    required: true
+  - name: coverage_basis
+    type: string
+    enum:
+    - declared
+    - renovation_generale
+    required: true
+  - name: metiers_couverts
+    type: array
+    required: true
+  - name: metiers_a_confirmer
+    type: array
+    required: true
+- name: ChantierSearchResult
+  description: Top-level result of rechercher_chantier.
+  source: mcp/renoolab-fr-mcp-tools-list.json#rechercher_chantier.outputSchema
+  fields:
+  - name: kind
+    type: string
+    enum:
+    - chantier_results
+    - search_needs_input
+  - name: ville
+    type: string
+  - name: metiers_demandes
+    type: array
+  - name: rayon_km
+    type: object
+  - name: coverage
+    type: string
+    enum:
+    - single_provider_explicit
+    - single_provider_general
+    - hybrid
+    - minimal_combination
+    - partial
+    - none
+  - name: solutions_completes
+    type: array
+  - name: combinaison_recommandee
+    type: array
+  - name: alternatives_par_metier
+    type: array
+  - name: metiers_non_couverts
+    type: array
+  - name: message
+    type: string
+  - name: avertissements
+    type: array
+  - name: widget_previews
+    type: object
+  - name: required_input
+    type: string
+    enum:
+    - city_disambiguation
+    - metiers_prioritaires
+  - name: question
+    type: string
+  - name: reason
+    type: string
+  - name: city_candidates
+    type: array
+  - name: metiers_recus
+    type: array
+  - name: max_selections
+    type: number
+- name: ContactRequest
+  description: >-
+    Input of contacter_artisan; becomes a private, moderated request (output kind contact_pending). Exactly one
+    target is required (oneOf artisan_id | external_place_id).
+  source: mcp/renoolab-fr-mcp-tools-list.json#contacter_artisan.inputSchema
+  fields:
+  - name: artisan_id
+    type: string
+    format: uuid
+  - name: external_place_id
+    type: string
+  - name: nom
+    type: string
+    required: true
+  - name: email
+    type: string
+    format: email
+    required: true
+  - name: telephone
+    type: string
+    required: true
+  - name: message
+    type: string
+    required: true
+- name: ArtisanProfileSignup
+  description: >-
+    Input of creer_profil_artisan; creates an inactive profile (output kind signup_created with profil {nom, ville,
+    metiers}).
+  source: mcp/renoolab-fr-mcp-tools-list.json#creer_profil_artisan.inputSchema
+  fields:
+  - name: nom_entreprise
+    type: string
+    required: true
+  - name: siret
+    type: string
+  - name: metiers
+    type: array
+    required: true
+  - name: ville
+    type: string
+    required: true
+  - name: email
+    type: string
+    format: email
+    required: true
+  - name: telephone
+    type: string
+    required: true
+  - name: bio
+    type: string
+- name: Metier
+  description: >-
+    The 18 public trades (French canonical labels). "Fournisseur" exists only inside the app and is excluded from
+    the public tools; rechercher_chantier accepts the 17 trades other than Rénovation générale.
+  source: mcp/renoolab-fr-mcp-tools-list.json#creer_profil_artisan.inputSchema.metiers.items.enum
+  values:
+  - Rénovation générale
+  - Plomberie
+  - Électricité
+  - Maçonnerie
+  - Carrelage
+  - Peinture
+  - Plâtrerie/Plaquiste
+  - Isolation
+  - Menuiserie
+  - Parquet
+  - Charpente
+  - Couverture/Toiture
+  - Chauffage/Climatisation
+  - Serrurerie
+  - Paysagiste
+  - Pisciniste
+  - Décoration d'intérieur
+  - Nettoyage
+- name: Commune
+  description: >-
+    A French commune as resolved by the search tools (homonyms disambiguated by code_postal or departement). The
+    provider also publishes https://renoolab.fr/communes.json (~2,300 slugs -> {pros: count of artisans whose radius
+    covers the commune, page: RenooLab page}).
+  source: https://renoolab.fr/llms.txt ("Résoudre une commune")
+  fields:
+  - name: slug
+    type: string
+    note: lowercase, hyphenated, unaccented
+  - name: pros
+    type: integer
+  - name: page
+    type: string (URL)
+  - name: code_postal
+    type: string ^\d{5}$ (input)
+  - name: departement
+    type: string 01-95 | 2A | 2B | 3-digit (input)
+relationships:
+- from: Artisan
+  to: Metier
+  type: has_many
+  via: metiers[]
+- from: Artisan
+  to: Commune
+  type: belongs_to
+  via: ville (+ distance_km from the searched commune; each artisan declares an intervention radius)
+- from: ChantierSolution
+  to: Artisan
+  type: has_one
+  via: artisan
+- from: ChantierSolution
+  to: Metier
+  type: has_many
+  via: metiers_couverts[]
+- from: ChantierSearchResult
+  to: ChantierSolution
+  type: has_many
+  via: solutions_completes[] (max 3)
+- from: ContactRequest
+  to: Artisan
+  type: belongs_to
+  via: artisan_id
+- from: ContactRequest
+  to: ExternalListing
+  type: belongs_to
+  via: external_place_id (mutually exclusive with artisan_id)
+- from: ArtisanProfileSignup
+  to: Metier
+  type: has_many
+  via: metiers[] (1-18)
+- from: ArtisanProfileSignup
+  to: Artisan
+  type: becomes
+  via: activation by e-mail; inactive profiles are not returned by searches
+- from: Commune
+  to: Artisan
+  type: has_many
+  via: communes.json pros (count only)
+id_conventions:
+  artisan_id: >-
+    UUID (draft-07 format uuid with an explicit RFC-9562 pattern; nil and max UUIDs allowed by the pattern)
+  place_id: Google Maps Place ID, ^[A-Za-z0-9_-]{3,512}$
+  siret: 14 digits, verified against SIRENE when supplied
+render: null

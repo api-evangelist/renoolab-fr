@@ -1,0 +1,15 @@
+{
+  "name": "RenooLab",
+  "description": "Marketplace française d'artisans du bâtiment : rechercher jusqu'à cinq professionnels pour un métier autour d'une ville (30 km), trouver les professionnels pour un chantier multi-métiers (50 km), déposer une demande de contact direct (validée par RenooLab avant transmission), créer un profil artisan à la demande d'un artisan (activation par e-mail). Gratuit, sans commission.",
+  "url": "https://mcp.renoolab.fr/mcp",
+  "transport": "streamable-http",
+  "authentication": "oauth2.1",
+  "provider": {
+    "name": "RenooLab",
+    "url": "https://renoolab.fr",
+    "contact": "contact@renoolab.fr"
+  },
+  "documentation": "https://renoolab.fr/mcp/",
+  "privacy_policy": "https://renoolab.fr/privacy/",
+  "terms": "https://renoolab.fr/cgu/"
+}

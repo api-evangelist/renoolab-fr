@@ -1,0 +1,97 @@
+generated: '2026-09-19'
+method: probed
+source: https://renoolab.fr/.well-known/agent-card.json
+name: RenooLab A2A Agent Card
+company: RenooLab
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: renoolab.fr
+  also_served_at: https://a2a.renoolab.fr/.well-known/agent-card.json
+  note: >-
+    The same 3,030-byte document (byte-identical, same ETag-free body) is served from the primary
+    domain and from the A2A endpoint host a2a.renoolab.fr, which is the host the card's own
+    supportedInterfaces[0].url names. The legacy /.well-known/agent.json path 404s on both hosts.
+    The card is also listed as entry 12 of the provider's ARD / ai-catalog federation manifest at
+    https://renoolab.fr/.well-known/ard.json (type application/a2a-agent-card+json) and linked from
+    https://renoolab.fr/mcp/ and https://renoolab.fr/llms.txt.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: '1.0'
+  protocol_version_location: supportedInterfaces[0].protocolVersion
+  preferred_transport: JSONRPC
+  transport_location: supportedInterfaces[0].protocolBinding
+  hard_checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+  optional_fields:
+    defaultInputModes: [text/plain, application/json]
+    defaultOutputModes: [text/plain, application/json]
+    preferredTransport: absent (removed in A2A 1.0.0; binding declared per interface)
+  deviations: []
+  grade_basis: >-
+    The card is written in the A2A 1.0.0 shape, not the 0.3 shape: it carries a supportedInterfaces[]
+    array whose single entry declares url https://a2a.renoolab.fr/a2a, protocolBinding JSONRPC and
+    protocolVersion "1.0" - which is where the 1.0.0 specification places the protocol version and the
+    binding (the 0.3-era top-level url / preferredTransport / additionalInterfaces / protocolVersion
+    fields were folded into AgentInterface). capabilities is an object ({streaming: false,
+    pushNotifications: false, extendedAgentCard: false}), skills is a one-element array with id, name,
+    description, tags[] (28), examples[] (8, French and English) and per-skill input/output modes, and
+    both default mode arrays are present. There is no top-level protocolVersion, which the pre-1.0
+    grading table would list as a deviation; against the 1.0.0 specification the grade names, the
+    version is present at the location that specification defines, so this is recorded as conformant
+    with the location made explicit for any reader who needs to re-grade.
+  live_endpoint_check: >-
+    GET https://a2a.renoolab.fr/a2a answered 405 (JSON body); POST with a JSON-RPC envelope carrying an
+    unknown method answered HTTP 400 {"jsonrpc":"2.0","id":null,"error":{"code":-32009,"message":"Version
+    A2A invalide.","data":{"request_id":"..."}}} - a live JSON-RPC responder that validates the A2A
+    version before dispatch. No message/send was issued: the agent's only skill runs a real artisan
+    search and this pipeline does not execute provider actions.
+card:
+  name: RenooLab — artisans en France
+  url: https://a2a.renoolab.fr/a2a
+  version: 1.0.2
+  provider_organization: RenooLab
+  provider_url: https://renoolab.fr
+  documentation_url: https://renoolab.fr/mcp/
+  icon_url: https://renoolab.fr/logo-128.webp
+  capabilities:
+    streaming: false
+    pushNotifications: false
+    extendedAgentCard: false
+  security_schemes: none declared (the docs and the card description state the agent is read-only and anonymous)
+  skills: 1
+  skill_ids: [find_artisans_france]
+  skill_summary: >-
+    find_artisans_france - find building tradespeople in France by trade and city, for one precise
+    trade or a confirmed multi-trade project; infers a trade from a described problem or asks for
+    clarification; returns RenooLab profiles and contact options, never contacts a professional and
+    never writes business data. 28 tags (trade names plus problem-to-trade, france, multi-trade,
+    read-only), 8 example utterances in French and English.
+  file: renoolab-fr-agent-card.json
+subject: api
+subject_basis: >-
+  The card's interface URL host (a2a.renoolab.fr) is registered as the baseURL of the RenooLab A2A
+  Agent entry in apis.yml, and the card describes a callable agent over the provider's own artisan
+  search engine (the same engine behind the MCP tools, per https://renoolab.fr/mcp/), not a
+  documentation site.
+related:
+  mcp: mcp/renoolab-fr-mcp.yml
+  llms_txt: llms/renoolab-fr-llms.txt
+  catalog: well-known/renoolab-fr-ard.json
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://renoolab.fr/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json
+  content_length: 3030
+  headers_of_note: [access-control-allow-origin: '*', cache-control: 'public, max-age=300', x-content-type-options: nosniff, server: cloudflare]
+  also_probed:
+  - {url: 'https://a2a.renoolab.fr/.well-known/agent-card.json', http_status: 200, content_type: 'application/json; charset=utf-8', note: byte-identical}
+  - {url: 'https://renoolab.fr/.well-known/agent.json', http_status: 404}
+  - {url: 'https://a2a.renoolab.fr/.well-known/agent.json', http_status: 404}
+  - {url: 'https://mcp.renoolab.fr/.well-known/agent-card.json', http_status: 404}
+  - {url: 'https://app.renoolab.fr/.well-known/agent-card.json', http_status: 200, note: 'HTML SPA shell (3,132 bytes) returned for every path on that host, including a negative-control path - not a card'}
+  - {url: 'https://a2a.renoolab.fr/a2a', http_status: 405, note: GET; POST unknown JSON-RPC method -> 400 with A2A error -32009}

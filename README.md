@@ -64,5 +64,10 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-RenooLab is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://renoolab.fr/
+RenooLab ("le réseau social de la rénovation") is a French marketplace connecting homeowners with building tradespeople across 19 trades, free for both sides and without commission. Its public developer surface is agent-native: an official remote MCP server at https://mcp.renoolab.fr/mcp (four tools; anonymous read-only searches, OAuth 2.1-gated writes), a read-only A2A 1.0 agent at https://a2a.renoolab.fr/a2a with its card at /.well-known/agent-card.json, ten provider-published Agent Skills, an ARD / ai-catalog manifest, WebMCP page tools and an llms.txt. No OpenAPI or SDK is published; the MCP tools/list contract saved under mcp/ is the machine-readable core of this profile.
+
+- Website: https://renoolab.fr/
+- Agent / MCP documentation: https://renoolab.fr/mcp/
+- MCP endpoint: https://mcp.renoolab.fr/mcp (MCP Registry `fr.renoolab/mcp`)
+- A2A agent card: https://renoolab.fr/.well-known/agent-card.json
+- Agent Skills: https://renoolab.fr/.well-known/agent-skills/index.json

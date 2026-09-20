@@ -1,0 +1,60 @@
+generated: '2026-09-19'
+method: searched
+source: https://registry.modelcontextprotocol.io/v0/servers?search=fr.renoolab%2Fmcp
+docs:
+- https://renoolab.fr/mcp/
+- https://github.com/mehdimicra/renoolab-mcp
+- https://github.com/mehdimicra/renoolab-agent-skills/releases
+- https://renoolab.fr/cgu/
+versioning:
+  scheme: semver on the MCP server (serverInfo.version, MCP Registry versions) and on the Agent Skills collection (git tags / archive path v0.5.5); the A2A card carries its own version field
+  current:
+    mcp_server: 1.4.0 (live serverInfo 2026-09-19; MCP Registry isLatest 2026-08-23)
+    mcp_protocol: '2025-06-18'
+    agent_skills: 0.5.5 (GitHub release 2026-08-23; archives at /.well-known/agent-skills/packages/v0.5.5/)
+    a2a_card: 1.0.2 (protocolVersion "1.0" per interface)
+    webmcp_widget: artisans-v16 (v15 kept as a compat resource)
+  detail: >-
+    The endpoint URL is unversioned (https://mcp.renoolab.fr/mcp); versions are surfaced through serverInfo and
+    the registry, and the tool contract is snapshotted per release by the provider
+    (schemas/mcp-tools-v1.4.0.json in the metadata repo, captured 2026-08-23 with source and post-sanitization
+    SHA-256 hashes). The 1.0.0 registry entry pointed at a workers.dev hostname; from 1.1.0 (2026-07-15) the
+    custom domain mcp.renoolab.fr is the remote.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  detail: >-
+    No deprecation or sunset policy is published. Backward-compatibility practice is visible in the live
+    server: the previous UI widget (ui://widget/artisans-v15.html) is kept as an explicitly named compat
+    resource alongside v16, and the metadata repo README notes that "Fournisseur" (supplier) was deliberately
+    removed from the public MCP trade list (app-only). RFC 8594 headers are not used.
+  observed_deprecations: []
+sla:
+  url: null
+  uptime_target: null
+  detail: >-
+    No SLA. CGU §11 states RenooLab "ne peut garantir une disponibilité continue ni l'absence d'erreurs"; the
+    support page promises a reply "dans les meilleurs délais" without a stated period. The MCP docs commit to
+    explicit dependency and timeout errors ("les erreurs de dépendance et délais dépassés sont explicites")
+    rather than to an availability figure.
+status_page: null
+status_page_note: No status page found (no status.renoolab.fr link anywhere on the site, docs, llms.txt or repos).
+support:
+  url: https://renoolab.fr/support/
+  email: support@renoolab.fr
+  security_reports: support@renoolab.fr (renoolab-mcp SECURITY.md) and contact@renoolab.fr (agent-skills SECURITY.md)
+release_history:
+  mcp_server:
+  - {version: 1.0.0, date: '2026-07-06', source: MCP Registry}
+  - {version: 1.1.0, date: '2026-07-15', source: MCP Registry}
+  - {version: 1.2.0, date: '2026-08-08', source: MCP Registry}
+  - {version: 1.2.1, date: '2026-08-13', source: MCP Registry}
+  - {version: 1.4.0, date: '2026-08-23', source: MCP Registry (isLatest) + live serverInfo}
+  agent_skills:
+  - {version: 0.3.0, date: '2026-07-31'}
+  - {version: 0.4.2, date: '2026-07-31'}
+  - {version: 0.5.0, date: '2026-08-10'}
+  - {version: 0.5.3, date: '2026-08-11'}
+  - {version: 0.5.5, date: '2026-08-23'}
+deprecated_operations: []

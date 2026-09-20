@@ -1,0 +1,59 @@
+generated: '2026-09-19'
+method: searched
+source: https://renoolab.fr/mcp/
+docs:
+- https://renoolab.fr/mcp/index.md ("Sécurité, modération et limites")
+- https://github.com/mehdimicra/renoolab-mcp (README "Search contracts")
+- https://renoolab.fr/privacy/ (§2 anti-abuse data)
+limit_count: 3
+summary: >-
+  RenooLab publishes quotas on the two WRITE tools, not a requests-per-second ceiling on reads: contacts are
+  capped per requester identity (e-mail or phone) over 6 hours with a per-artisan cooldown of 24 hours, and
+  profile creation is capped per actor / contact details over 24 hours. The docs describe the enforcement as
+  "quotas atomiques et anti-doublon" applied server-side independently of the model, keyed on a pseudonymous
+  actor id, the e-mail, the phone and an HMAC of the IP (privacy policy). No rate-limit response headers, no
+  status code and no Retry-After behaviour are published; exhaustion surfaces as a tool error whose shape is
+  not documented. Read tools carry result caps (5 profiles, 3 complete solutions) and radius caps (30 / 50 km)
+  rather than call quotas.
+rate_limits:
+- name: Contact requests per requester
+  scope: per-requester (e-mail or telephone)
+  limit: 10
+  window: 6h
+  metric: distinct artisans contacted
+  burst: null
+  applies_to: [contacter_artisan, 'WebMCP contacter_artisan_renoolab', 'site contact forms']
+  exhaustion_status: unpublished
+  headers: []
+  source: 'https://renoolab.fr/mcp/ - "Le contact est limité à 10 artisans différents sur 6 heures par e-mail ou téléphone"'
+- name: Contact cooldown per artisan
+  scope: per-requester per-artisan
+  limit: 1
+  window: 24h
+  metric: contact request to the same artisan
+  burst: null
+  applies_to: [contacter_artisan]
+  exhaustion_status: unpublished
+  headers: []
+  source: 'https://renoolab.fr/mcp/ - "avec une seule demande au même artisan sur 24 heures"'
+- name: Profile creation attempts
+  scope: per-actor or per contact details (e-mail / phone)
+  limit: 10
+  window: 24h
+  metric: creer_profil_artisan attempts
+  burst: null
+  applies_to: [creer_profil_artisan, 'WebMCP inscrire_artisan_renoolab']
+  exhaustion_status: unpublished
+  headers: []
+  source: 'https://renoolab.fr/mcp/ - "La création de profils est limitée à 10 tentatives sur 24 heures par acteur ou coordonnées"'
+result_and_size_limits:
+- {name: Profiles per single-trade search, limit: 5, applies_to: rechercher_artisans, source: 'outputSchema artisans maxItems 5; docs "jusqu''à 5 profils"'}
+- {name: External listings per search, limit: 5, applies_to: rechercher_artisans, source: outputSchema external_results maxItems 5}
+- {name: Single-trade search radius, limit: 30 km, applies_to: rechercher_artisans, source: 'docs "rayon strict de 30 km"'}
+- {name: Multi-trade search radius, limit: 50 km, applies_to: rechercher_chantier, source: 'docs "rayon de 50 km"'}
+- {name: Complete solutions per project search, limit: 3, applies_to: rechercher_chantier, source: outputSchema solutions_completes maxItems 3}
+- {name: Trades per project, limit: '17 accepted; server asks to prioritise at most 6', applies_to: rechercher_chantier, source: 'inputSchema metiers_confirmes maxItems 17; skills reference required_input=metiers_prioritaires'}
+- {name: Free-text need length, limit: 3-500 chars, applies_to: rechercher_artisans.besoin}
+- {name: Contact message length, limit: 5-2000 chars, applies_to: contacter_artisan.message}
+- {name: A2A text/plain fallback request, limit: 500 chars, applies_to: 'https://a2a.renoolab.fr/a2a', source: 'privacy policy §2'}
+headers_observed: none (no X-RateLimit-*, RateLimit-* or Retry-After on the anonymous tools/list response)

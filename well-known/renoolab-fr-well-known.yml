@@ -1,0 +1,123 @@
+generated: '2026-09-19'
+method: searched
+probe_date: '2026-09-19'
+summary: >-
+  Five hosts probed by name against the closed path list. The primary domain serves no RFC 9116 / OIDC /
+  RFC 8414 / RFC 9727 / ai-plugin / UCP / ACP / AAuth / APIs.json document but does serve an A2A agent
+  card, an MCP server card (/.well-known/mcp.json), an ARD 1.0 federation manifest (/.well-known/ard.json,
+  byte-identical copy at /.well-known/ai-catalog.json) and an agentskills.io discovery index
+  (/.well-known/agent-skills/index.json) - all real JSON documents linked from the site's llms.txt and
+  homepage. The MCP host mcp.renoolab.fr serves RFC 9728 protected-resource metadata and RFC 8414
+  authorization-server metadata (with a dynamic-client-registration endpoint) and 404s everything else in
+  plain text. The A2A host a2a.renoolab.fr serves the agent card and 404s everything else in JSON. www.
+  301s every path to the apex. app.renoolab.fr is a single-page-app catch-all that answers 200 with the same
+  3,132-byte HTML shell for every path INCLUDING the negative-control path, so nothing on it counts. The
+  negative-control path 404d on all four non-SPA hosts (path_echo_control passed).
+hit_count: 8
+pointer_note: >-
+  WellKnown pointer emitted because real documents were served (oauth-protected-resource and
+  oauth-authorization-server on the MCP host; mcp.json, ard.json, ai-catalog.json and the agent-skills
+  index on the apex). No SecurityTxt pointer - security.txt 404d on every host.
+hosts:
+- host: https://renoolab.fr
+  path_echo_control: passed
+  negative_control: {path: /.well-known/renoolab-negative-control-9f2c1a.json, status: 404}
+  soft_404_note: 404s return the site's HTML 404 page (36,803 bytes, text/html) - a real 404 status, not a soft 200
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/api-catalog.json, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/ucp.json, status: 404}
+  - {path: /.well-known/acp.json, status: 404}
+  - {path: /.well-known/aauth-resource.json, status: 404}
+  - {path: /.well-known/apis.json, status: 404}
+  - {path: /apis.json, status: 404}
+  - {path: /apis.yml, status: 404}
+  - {path: /.well-known/agent-card.json, status: 200, content_type: application/json, file: ../a2a/renoolab-fr-agent-card.json, note: A2A agent card - saved and graded in a2a/renoolab-fr-a2a.yml}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/mcp.json, status: 200, content_type: application/json, file: renoolab-fr-mcp.json, note: 'MCP server card: name, description, url https://mcp.renoolab.fr/mcp, transport streamable-http, authentication oauth2.1, provider contact, documentation, privacy_policy, terms. Linked from ard.json metadata.manifestUrl.'}
+  - {path: /.well-known/ard.json, status: 200, content_type: application/json, file: renoolab-fr-ard.json, note: 'Agent Registry Discovery manifest, specVersion 1.0, host renoolab.fr, 12 entries: 1 application/mcp-server+json (with the full 4-tool inputSchema set inline), 10 application/agent-skills+gzip, 1 application/a2a-agent-card+json. 121,738 bytes.'}
+  - {path: /.well-known/ai-catalog.json, status: 200, content_type: application/json, file: renoolab-fr-ai-catalog.json, note: byte-identical to ard.json (the provider publishes the same catalog under both names)}
+  - {path: /.well-known/agent-skills/index.json, status: 200, content_type: application/json, file: renoolab-fr-agent-skills-index.json, note: 'agentskills.io discovery index (schema 0.2.0): 10 archive entries with url + sha256 digest; every digest verified against the fetched tar.gz'}
+  - {path: /llms.txt, status: 200, content_type: 'text/markdown; charset=utf-8', file: ../llms/renoolab-fr-llms.txt}
+  - {path: /llms-full.txt, status: 404}
+- host: https://www.renoolab.fr
+  redirect: 301 to https://renoolab.fr for every path probed (HTML redirect body, 167 bytes)
+  documents:
+  - {path: /.well-known/security.txt, status: 301, redirect_to: 'https://renoolab.fr/.well-known/security.txt'}
+  - {path: /.well-known/openid-configuration, status: 301}
+  - {path: /.well-known/oauth-authorization-server, status: 301}
+  - {path: /.well-known/oauth-protected-resource, status: 301}
+  - {path: /.well-known/api-catalog, status: 301}
+  - {path: /.well-known/ai-plugin.json, status: 301}
+  - {path: /.well-known/ucp.json, status: 301}
+  - {path: /.well-known/acp.json, status: 301}
+  - {path: /.well-known/aauth-resource.json, status: 301}
+  - {path: /.well-known/apis.json, status: 301}
+  - {path: /apis.json, status: 301}
+  - {path: /apis.yml, status: 301}
+  - {path: /.well-known/agent-card.json, status: 301}
+  - {path: /.well-known/agent.json, status: 301}
+- host: https://mcp.renoolab.fr
+  role: MCP resource server and OAuth authorization server (issuer https://mcp.renoolab.fr)
+  path_echo_control: passed
+  negative_control: {path: /.well-known/renoolab-negative-control-9f2c1a.json, status: 404}
+  soft_404_note: misses answer 404 text/plain "Not found" (9 bytes)
+  documents:
+  - {path: /.well-known/oauth-protected-resource, status: 200, content_type: application/json, file: renoolab-fr-oauth-protected-resource.json, note: 'RFC 9728: resource https://mcp.renoolab.fr, authorization_servers [https://mcp.renoolab.fr], bearer_methods_supported [header]'}
+  - {path: /.well-known/oauth-authorization-server, status: 200, content_type: application/json, file: renoolab-fr-oauth-authorization-server.json, note: 'RFC 8414: authorization_endpoint /authorize, token_endpoint /token, registration_endpoint /register (RFC 7591 DCR), revocation_endpoint /token, response_types [code], grant_types [authorization_code, refresh_token], token_endpoint_auth_methods [client_secret_basic, client_secret_post, none], code_challenge_methods [S256], client_id_metadata_document_supported false. No scopes_supported.'}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/api-catalog.json, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/ucp.json, status: 404}
+  - {path: /.well-known/acp.json, status: 404}
+  - {path: /.well-known/aauth-resource.json, status: 404}
+  - {path: /.well-known/apis.json, status: 404}
+  - {path: /apis.json, status: 404}
+  - {path: /apis.yml, status: 404}
+  - {path: /.well-known/agent-card.json, status: 404}
+  - {path: /.well-known/agent.json, status: 404}
+- host: https://a2a.renoolab.fr
+  role: A2A JSON-RPC endpoint host (POST /a2a)
+  path_echo_control: passed
+  negative_control: {path: /.well-known/renoolab-negative-control-9f2c1a.json, status: 404}
+  soft_404_note: misses answer 404 application/json (143 bytes)
+  documents:
+  - {path: /.well-known/agent-card.json, status: 200, content_type: 'application/json; charset=utf-8', file: ../a2a/renoolab-fr-agent-card.json, note: byte-identical to the apex copy}
+  - {path: /.well-known/agent.json, status: 404}
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/api-catalog.json, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /.well-known/ucp.json, status: 404}
+  - {path: /.well-known/acp.json, status: 404}
+  - {path: /.well-known/aauth-resource.json, status: 404}
+  - {path: /.well-known/apis.json, status: 404}
+  - {path: /apis.json, status: 404}
+  - {path: /apis.yml, status: 404}
+- host: https://app.renoolab.fr
+  role: end-user web application (SPA)
+  catch_all: true
+  hit_count: 0
+  path_echo_control: failed
+  negative_control: {path: /.well-known/renoolab-negative-control-9f2c1a.json, status: 200, content_type: 'text/html; charset=utf-8', bytes: 3132}
+  soft_404_control: every probed path returned HTTP 200 with the same 3,132-byte HTML shell, including the negative-control path, /openapi.json, /swagger.json and /apis.json - none of these are documents and none are recorded as hits
+  documents:
+  - {path: /.well-known/security.txt, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/openid-configuration, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/oauth-authorization-server, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/oauth-protected-resource, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/api-catalog, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/ai-plugin.json, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/agent-card.json, status: 200, note: SPA shell - not a document}
+  - {path: /.well-known/agent.json, status: 200, note: SPA shell - not a document}
+  - {path: /apis.json, status: 200, note: SPA shell - not a document}

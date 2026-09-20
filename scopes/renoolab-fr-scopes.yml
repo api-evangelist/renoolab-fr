@@ -1,0 +1,53 @@
+generated: '2026-09-19'
+method: searched
+source: https://mcp.renoolab.fr/.well-known/oauth-authorization-server
+docs: https://renoolab.fr/mcp/
+sources:
+- https://mcp.renoolab.fr/.well-known/oauth-authorization-server
+- https://mcp.renoolab.fr/.well-known/oauth-protected-resource
+- https://mcp.renoolab.fr/mcp (tools/list _meta.securitySchemes)
+- https://renoolab.fr/mcp/
+- https://renoolab.fr/privacy/ (§5 token lifetimes)
+summary: >-
+  RenooLab runs its own OAuth 2.1 authorization server at https://mcp.renoolab.fr (RFC 8414 metadata served)
+  to protect the two write tools of its MCP server. It defines NO named scopes: the AS metadata carries no
+  scopes_supported, and both OAuth-gated tools declare {type: oauth2, scopes: []} in _meta.securitySchemes.
+  Consent is all-or-nothing at the tool-set level - the docs say the user "accepte l'accès aux quatre outils"
+  - and no RenooLab account is needed to grant it. The two search tools are noauth and never enter the OAuth
+  flow. There is no OpenAPI to derive from; derive-oauth-scopes.py found no oauth2 schemes for this slug.
+schemes:
+- name: RenooLabOAuth
+  type: oauth2
+  issuer: https://mcp.renoolab.fr
+  source: well-known/renoolab-fr-oauth-authorization-server.json
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://mcp.renoolab.fr/authorize
+    tokenUrl: https://mcp.renoolab.fr/token
+    refreshUrl: https://mcp.renoolab.fr/token
+    revocationUrl: https://mcp.renoolab.fr/token
+    registrationUrl: https://mcp.renoolab.fr/register
+    pkce: S256 (required per docs)
+    response_types: [code]
+    response_modes: [query]
+    grant_types: [authorization_code, refresh_token]
+    token_endpoint_auth_methods: [client_secret_basic, client_secret_post, none]
+    client_id_metadata_document_supported: false
+    scopes: {}
+  protected_resource: https://mcp.renoolab.fr
+  bearer_methods: [header]
+  account_required: false
+  token_lifetimes:
+    access_token: 1 hour
+    refresh_token: 30 days
+    dynamic_client: 90 days
+    consent_session: 10 minutes
+    revocation_browser_id: 12 months
+    source: https://renoolab.fr/privacy/ §5
+scopes: []
+scope_count: 0
+tool_requirements:
+- {tool: rechercher_artisans, security: noauth}
+- {tool: rechercher_chantier, security: noauth}
+- {tool: contacter_artisan, security: 'oauth2, scopes: []'}
+- {tool: creer_profil_artisan, security: 'oauth2, scopes: []'}

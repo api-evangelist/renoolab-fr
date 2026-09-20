@@ -1,0 +1,59 @@
+generated: '2026-09-19'
+method: searched
+source: https://renoolab.fr/artisans/
+docs:
+- https://renoolab.fr/artisans/
+- https://renoolab.fr/a-propos/
+- https://renoolab.fr/cgu/ (§5 Abonnements payants)
+- https://renoolab.fr/mcp/
+plan_count: 3
+currency: EUR
+model: free marketplace for homeowners and tradespeople, no commission on jobs, no lead reselling; optional paid visibility subscriptions for tradespeople sold in-app through Apple App Store / Google Play; the MCP, A2A, WebMCP and Agent Skills surfaces are free and need no account
+summary: >-
+  RenooLab publishes no price list on the web. The site states repeatedly that the service is free for both
+  sides ("0€ pour créer votre profil", "gratuit, sans commission", "aucune revente de coordonnées") and that
+  two optional tradesperson subscriptions, Pro and Premium, exist for extra visibility ("plus de photos,
+  priorité dans les résultats", "mise en avant"); the CGU say their prices and conditions "sont présentés dans
+  l'application avant toute souscription", managed by the app stores with automatic renewal. The prices are
+  therefore not publicly readable and are recorded as null. Agent access (MCP/A2A) is free: the docs state
+  the service "est gratuit, sans commission" and that no RenooLab account is required to authorise the
+  connector.
+plans:
+- id: particulier
+  name: Particulier (homeowner)
+  price: 0
+  currency: EUR
+  period: n/a
+  included: [search artisans by trade and city, view portfolios and reviews, contact artisans directly without an account, post a renovation project and receive up to 3 quotes, MCP / A2A / WebMCP agent access]
+  limits: [contact quotas - see rate-limits/renoolab-fr-rate-limits.yml]
+  overage: null
+- id: artisan-gratuit
+  name: Artisan - profil gratuit
+  price: 0
+  currency: EUR
+  period: n/a
+  included: [profile with before/after photos, customer reviews, activity medal badge, local visibility (commune page + radius cities), direct customer requests, respond to homeowner projects]
+  limits: ['projects: 3 tradesperson responses per trade per project (first come)', photo count lower than paid tiers (number not published)]
+  overage: null
+  note: '"L''inscription artisan sur RenooLab est gratuite, sans commission et ouverte partout en France" - https://renoolab.fr/artisans/'
+- id: artisan-pro
+  name: Artisan Pro
+  price: null
+  currency: EUR
+  period: subscription (auto-renewing, via App Store / Google Play)
+  included: [more photos, priority in results, featured placement ("mise en avant")]
+  limits: []
+  overage: null
+  note: Price shown only inside the mobile app before purchase (CGU §5); not published on the web.
+- id: artisan-premium
+  name: Artisan Premium
+  price: null
+  currency: EUR
+  period: subscription (auto-renewing, via App Store / Google Play)
+  included: [more photos, priority in results, featured placement ("mise en avant"); "boosts" also referenced on the account-deletion page]
+  limits: []
+  overage: null
+  note: Price shown only inside the mobile app before purchase (CGU §5); not published on the web.
+free_tier: true
+contact_sales: false
+agent_access_pricing: free, no account, no key; OAuth consent only for the two write tools

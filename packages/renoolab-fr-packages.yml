@@ -1,0 +1,25 @@
+generated: '2026-09-19'
+method: searched
+source: registry searches 2026-09-19
+package_count: 0
+packages: []
+searched:
+- {registry: npm, query: 'https://registry.npmjs.org/-/v1/search?text=renoolab&size=10', result: 0 packages}
+- {registry: pypi, query: 'https://pypi.org/pypi/renoolab/json', status: 404}
+- {registry: github, query: 'https://api.github.com/search/repositories?q=renoolab', result: '2 repositories, both first-party metadata/skills repos under github.com/mehdimicra (renoolab-mcp, renoolab-agent-skills); neither is an installable client library'}
+- {registry: mcp-registry, query: 'https://registry.modelcontextprotocol.io/v0/servers?search=fr.renoolab%2Fmcp', result: 'remote-only listing (streamable-http https://mcp.renoolab.fr/mcp); no packages[] entry, no stdio distribution'}
+non_registry_distributions:
+- name: renoolab-agent-skills
+  kind: agent-skills collection (not an SDK)
+  official: true
+  distribution: git (npx skills add https://github.com/mehdimicra/renoolab-agent-skills) and first-party archives at https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/
+  version: 0.5.5
+  published: '2026-08-23'
+  license: Apache-2.0
+  source: https://github.com/mehdimicra/renoolab-agent-skills/releases/tag/v0.5.5
+  note: Catalogued in skills/_index.yml; listed here only so the absence of an SDK is not misread as an absence of any distributable.
+note: >-
+  RenooLab ships no client library, SDK, CLI or stdio MCP package in any registry searched; the documented way
+  in is the hosted MCP endpoint, the A2A endpoint, the WebMCP page tools, or the Agent Skills. The MCP
+  metadata repository states explicitly: "This repository is not an installable package and does not contain
+  the remote server implementation." No SDKs pointer is emitted.

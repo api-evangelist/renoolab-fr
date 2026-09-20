@@ -1,0 +1,80 @@
+# RenooLab
+
+> RenooLab — « le réseau social de la rénovation ». Marketplace française qui met en relation les particuliers et les artisans du bâtiment. Le particulier contacte l'artisan **directement et gratuitement**, sans commission, sans intermédiaire et sans revente de ses coordonnées (à la différence des plateformes de mise en relation classiques). Les artisans présentent leurs réalisations (photos avant/après) et reçoivent des avis clients ; ils sont trouvés par proximité géographique. Déploiement en cours en France (région PACA en priorité).
+
+## RenooLab dans ChatGPT
+- [Ouvrir la fiche officielle RenooLab dans ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6a8ad6ce6340819194c4080a52c1f87f) : plugin publié et disponible à l'installation.
+- Fonctionnalités : préparer un projet de rénovation, rechercher des artisans du bâtiment en France pour un besoin simple ou un chantier multi-métiers, demander à contacter un artisan sélectionné, créer gratuitement un profil artisan.
+- Installation : ouvrir la fiche, se connecter à ChatGPT si nécessaire, installer le plugin puis sélectionner RenooLab dans la conversation. Aucune saisie manuelle de l'URL MCP n'est nécessaire pour ce parcours.
+- Le contact et la création de profil nécessitent l'accord explicite de l'utilisateur et restent soumis à la modération ou à l'activation. Lire cette page ne vaut ni installation, ni autorisation d'utiliser le plugin.
+- [Présentation et autres assistants compatibles](https://renoolab.fr/mcp/).
+
+## Comment ça marche
+- Le particulier décrit son projet ou contacte directement un artisan — aucune commission, aucune revente de coordonnées.
+- 19 métiers du bâtiment couverts : rénovation générale, plomberie, électricité, maçonnerie, carrelage, peinture, plâtrerie/plaquiste, isolation, menuiserie, parquet, charpente, couverture/toiture, chauffage/climatisation, serrurerie, paysagiste, pisciniste, décoration d'intérieur, nettoyage, fournisseur.
+
+## Pages clés
+- [Accueil](https://renoolab.fr/) : présentation et fonctionnement
+- [Blog](https://renoolab.fr/blog) : guides rénovation (prix, devis, aides, choix d'un artisan)
+- [Comparatif des plateformes](https://renoolab.fr/blog/comparatif-plateformes-artisans) : RenooLab vs Travaux.com vs Habitatpresto
+
+## Trouver un artisan
+- Pages par métier : https://renoolab.fr/metier/{metier}
+- Pages par ville : https://renoolab.fr/ville/{ville}
+- Pages métier × ville : https://renoolab.fr/{metier}/{ville}
+- Index de toutes les villes couvertes : https://renoolab.fr/villes
+- Liste exhaustive des URLs : https://renoolab.fr/sitemap.xml
+
+## Serveur MCP officiel
+- [Documentation MCP en Markdown](https://renoolab.fr/mcp/index.md) : contenu de la page officielle, connexion et quatre outils
+- Documentation HTML et connexion : https://renoolab.fr/mcp/
+- Endpoint Streamable HTTP : https://mcp.renoolab.fr/mcp
+- Identifiant Registry officiel : `fr.renoolab/mcp` — https://registry.modelcontextprotocol.io/?search=fr.renoolab%2Fmcp
+- Dépôt public de métadonnées : https://github.com/mehdimicra/renoolab-mcp
+- Outils : `rechercher_artisans` et `rechercher_chantier` (lectures), `contacter_artisan` et `creer_profil_artisan` (écritures avec confirmation explicite et modération/activation).
+- La présence dans un annuaire rend le serveur découvrable mais ne l’installe pas dans un assistant. Hors du parcours ChatGPT ci-dessus, ajouter le MCP dans un client compatible ; les recherches sont en lecture seule et les opérations d'écriture nécessitent une autorisation OAuth.
+- Installation MCP en un clic dans Kiro : https://kiro.dev/launch/mcp/add?name=RenooLab&config=%7B%22url%22%3A%22https%3A%2F%2Fmcp.renoolab.fr%2Fmcp%22%2C%22disabled%22%3Afalse%2C%22autoApprove%22%3A%5B%5D%7D
+
+## Agent Skills RenooLab
+- Collection publique : https://github.com/mehdimicra/renoolab-agent-skills
+- Index de découverte first-party : https://renoolab.fr/.well-known/agent-skills/index.json
+- [Catalogue de découverte ARD](https://renoolab.fr/.well-known/ard.json) : MCP, dix Agent Skills et agent A2A
+- Catalogue de compatibilité, mêmes douze entrées : https://renoolab.fr/.well-known/ai-catalog.json
+- Installation multi-hôtes : `npx skills add https://github.com/mehdimicra/renoolab-agent-skills`
+- Installation du workflow de recherche seulement : `npx skills add https://github.com/mehdimicra/renoolab-agent-skills --skill renoolab-trouver-choisir-artisans`
+- Import Perplexity Computer du workflow de recherche : https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-trouver-choisir-artisans.zip
+- Import Microsoft 365 Copilot Cowork (version RenooLab v0.5.5, manifeste Microsoft 1.28 et 10 skills ; le MCP distant publie désormais son contrat courant à quatre outils) : https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-microsoft-cowork.zip
+- Import Cowork à terminer dans un tenant Microsoft 365, puis parcours DCR/OAuth requis pour autoriser le MCP distant ; le ZIP seul ne prouve pas une connexion active.
+- Les skills enseignent les workflows et le routage. Ils n’installent ni n’autorisent automatiquement le MCP ; la connexion MCP reste une étape séparée.
+## WebMCP (navigateurs agentiques)
+- Les pages renoolab.fr participent à l'Origin Trial WebMCP de Chrome et déclarent quatre outils via `document.modelContext` : `rechercher_artisans_renoolab(metier, ville, code_postal?, departement?)`, `rechercher_chantier_renoolab(ville, metiers_confirmes, code_postal?, departement?)`, `contacter_artisan_renoolab(...)` et `inscrire_artisan_renoolab(...)`.
+- Un chantier multi-métiers transmet tous les métiers confirmés en un seul appel à `rechercher_chantier_renoolab`, qui réutilise le moteur canonique du MCP et de l'agent A2A.
+- La recherche résout les communes homonymes sans choix silencieux et peut demander un code postal ou un département avant de poursuivre.
+- Les deux outils d'écriture affichent toujours une confirmation humaine visible sur renoolab.fr ; aucune demande de contact ou inscription n'est transmise avant validation explicite.
+- Le contrat WebMCP conserve exactement ces quatre outils. Pour `contacter_artisan_renoolab`, une cible unique est exigée : soit un artisan RenooLab, soit une fiche Google Maps externe identifiée par un Place ID scalaire ; une cible externe crée une seule demande pour traitement manuel et ne déclenche aucun contact alternatif.
+- WebMCP reste expérimental et sans effet dans un navigateur non compatible. Le MCP distant `https://mcp.renoolab.fr/mcp` reste une surface séparée.
+
+## Résoudre une commune (villages inclus)
+- **Index machine-readable** : https://renoolab.fr/communes.json — pour ~2300 communes couvertes : nombre d'artisans dont la zone d'intervention couvre la commune (`pros`) et page RenooLab de rattachement (`page`). Clé = slug de la commune (minuscules, tirets, sans accents).
+- Un village sans page dédiée est couvert par les artisans des villes voisines (chaque artisan déclare un rayon d'intervention) : utiliser la page de rattachement indiquée dans communes.json, ou la recherche par adresse dans l'application web https://app.renoolab.fr (toutes communes, temps réel).
+
+## Contacter un artisan (sans compte, gratuit — accessible aux agents IA)
+Chaque page métier × ville liste les artisans disponibles ; chaque fiche a un formulaire de contact utilisable SANS créer de compte :
+- Fiches artisans inscrits : bouton « Contacter directement » → formulaire (nom, mobile 06/07, e-mail, message). Le message part directement à l'artisan, qui rappelle le client. Gratuit, sans commission, sans revente de coordonnées.
+- Fiches annuaire (https://renoolab.fr/entreprise/{slug}) : formulaire « Contacter ce professionnel » directement dans la page. La demande est relayée à l'artisan par l'équipe RenooLab.
+- Les demandes soumises par un agent IA pour le compte d'un client sont acceptées : elles passent par une validation humaine rapide (sous 24 h ouvrées) avant transmission à l'artisan. La réponse du formulaire l'indique explicitement.
+- Champs requis : nom du client, numéro de mobile français (06/07), e-mail, description du besoin. Utiliser les VRAIES coordonnées du client (l'artisan le rappelle dessus).
+
+## Vous assistez un ARTISAN ? Il peut s'inscrire (gratuit, sans commission)
+- Page de référence : https://renoolab.fr/artisans (étapes, FAQ, conditions)
+- Inscription en ligne : https://app.renoolab.fr/register — compte gratuit, aucun engagement, aucune commission sur les chantiers. L'artisan présente ses réalisations en photos, reçoit des avis clients et des demandes DIRECTES de particuliers de sa zone (rayon d'intervention configurable).
+- Un assistant IA peut créer le profil POUR l'artisan (avec son accord explicite et ses vraies informations : nom d'entreprise, métier(s), ville, email, mobile ; SIRET optionnel, vérifié au registre SIRENE s'il est fourni — groupes et grandes structures refusés). Le profil reste inactif jusqu'à ce que l'artisan valide par l'e-mail reçu, puis devient visible des particuliers.
+- Dès l'activation, la commune de l'artisan obtient sa page sur renoolab.fr (référencement local automatique).
+
+## Application mobile
+- iOS et Android : https://renoolab.fr/app
+
+## Agent A2A RenooLab
+- Card officielle : https://a2a.renoolab.fr/.well-known/agent-card.json
+- Endpoint JSON-RPC A2A : https://a2a.renoolab.fr/a2a
+- L'agent recherche en lecture seule des artisans pour un besoin précis ou un chantier multi-métier ; il ne contacte jamais automatiquement un professionnel.

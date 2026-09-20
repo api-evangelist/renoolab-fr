@@ -1,0 +1,107 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://renoolab.fr/privacy/
+sources:
+- https://renoolab.fr/privacy/ (Politique de confidentialité, "Dernière mise à jour : 15 août 2026")
+- https://renoolab.fr/cgu/ (CGU, 15 juillet 2026)
+- https://renoolab.fr/mentions-legales/
+- https://renoolab.fr/suppression-compte/ (8 mai 2026)
+- https://renoolab.fr/support/
+probed_paths:
+- {url: 'https://renoolab.fr/accessibility', status: 404}
+- {url: 'https://renoolab.fr/legal/subprocessors', status: 404}
+- {url: 'https://renoolab.fr/security', status: 404}
+- {url: 'https://renoolab.fr/changelog', status: 404}
+- {url: 'https://renoolab.fr/.well-known/security.txt', status: 404}
+- {url: 'https://renoolab.fr/privacy/', status: 200}
+- {url: 'https://renoolab.fr/cgu/', status: 200}
+- {url: 'https://renoolab.fr/suppression-compte/', status: 200}
+- {url: 'https://renoolab.fr/mentions-legales/', status: 200}
+summary: >-
+  A French sole-trader marketplace publishing an unusually specific privacy policy. Four signals carry real
+  substance: a GDPR data-subject-request process with a channel, a one-month response commitment and the
+  CNIL as escalation; data residency stated per store (Supabase eu-west-3 Paris, Cloudflare R2 with EU
+  jurisdiction for private documents); a named processor list with purposes inside the dated privacy policy;
+  and a DSA-style notice-and-action mechanism (in-app "Signaler", review within 24 hours, block, automatic
+  pre-publication filtering) in the CGU. No SBOM, accessibility conformance report, support-lifetime
+  statement, GPC statement, incident-notification SLA, age-assurance, transparency report or exit/export
+  documentation is published. Retention periods are published in detail (privacy §5) and recorded under
+  data_subject_request for context.
+signals:
+  data_subject_request:
+    url: https://renoolab.fr/privacy/
+    section: '6. Vos droits'
+    channel: support@renoolab.fr, the support page, or in-app account deletion
+    stated_sla: 'Nous répondons dans un délai maximal d''un mois.'
+    rights_named: [accès, rectification, effacement, portabilité, opposition, limitation du traitement]
+    escalation: Commission Nationale de l'Informatique et des Libertés (CNIL), www.cnil.fr
+    deletion_page: https://renoolab.fr/suppression-compte/
+    deletion_detail: 'in-app deletion is immediate; e-mail deletion requests handled "sous 7 jours ouvrés"; the page lists exactly which data are erased and that authored reviews persist anonymised as "Utilisateur supprimé"'
+    retention_published: 'privacy §5 - private messages pseudonymised after 24 months; profile views deleted after 12 months; anti-abuse logs 30 days; assistant funnel logs 12 months; processed agentic contact requests have identifying fields erased after 90 days; never-activated assistant-created accounts deleted from 30 days; refused verification requests 12 months; accounting records up to 10 years'
+    evidence:
+    - source: https://renoolab.fr/privacy/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Vous disposez des droits d''accès, rectification, effacement, portabilité, opposition et limitation du traitement. Vous pouvez supprimer votre compte depuis l''application ou exercer vos droits via notre page support ou par e-mail à [support@renoolab.fr]. Nous répondons dans un délai maximal d''un mois. Vous pouvez également saisir la Commission Nationale de l''Informatique et des Libertés (CNIL).'
+    note: A section of the privacy policy plus a dedicated account-deletion page, not a request form or API (no /privacy/requests endpoint).
+  data_residency:
+    url: https://renoolab.fr/privacy/
+    section: '4. Hébergement et destinataires'
+    regions: [eu]
+    detail: 'accounts and application data on Supabase region Paris (eu-west-3); public photos on Cloudflare R2; verification documents in a private Cloudflare R2 bucket "avec juridiction européenne"; site served via Cloudflare Pages (host of record Cloudflare, Inc., San Francisco, per mentions légales); transfers outside the EEA "encadrés par les mécanismes contractuels applicables"'
+    evidence:
+    - source: https://renoolab.fr/privacy/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Les comptes et données applicatives sont hébergés sur Supabase en région Paris (eu-west-3). Les photos publiques sont stockées sur Cloudflare R2. Les justificatifs de vérification sont placés dans un bucket Cloudflare R2 privé avec juridiction européenne.'
+    - source: https://renoolab.fr/mentions-legales/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Les données dynamiques (profils artisans, avis, photos) sont stockées sur Supabase (région Paris, France) et Cloudflare R2 (jurisdiction EU).'
+    note: A stated hosting region for named data classes, not a selectable residency option; there is one region.
+  subprocessors:
+    url: https://renoolab.fr/privacy/
+    section: '4. Hébergement et destinataires'
+    dated: '2026-08-15'
+    form: prose list inside the dated privacy policy (no standalone subprocessor page - /legal/subprocessors 404)
+    entries:
+    - {vendor: Supabase, purpose: accounts and application data, location: 'Paris (eu-west-3)'}
+    - {vendor: Cloudflare (Pages, R2), purpose: site hosting, public photos, private verification documents, location: 'EU jurisdiction bucket; Cloudflare Inc. US'}
+    - {vendor: RevenueCat, purpose: subscription status and payment history}
+    - {vendor: Apple / Google, purpose: in-app purchases, push delivery (APNs / FCM)}
+    - {vendor: Expo, purpose: push notifications}
+    - {vendor: Brevo, purpose: transactional e-mail (receives name, e-mail, message content and activation link)}
+    - {vendor: Google Analytics / Google Ads / Meta, purpose: audience and advertising measurement, consent-gated, may transfer data to the United States}
+    evidence:
+    - source: https://renoolab.fr/privacy/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Selon la fonctionnalité utilisée, des données strictement nécessaires sont traitées par RevenueCat, Apple ou Google pour les achats, Expo puis Apple APNs ou Google FCM pour les notifications, et Brevo pour les e-mails transactionnels.'
+  notice_and_action:
+    url: https://renoolab.fr/cgu/
+    section: '8. Politique de tolérance zéro et modération'
+    mechanism: [in-app "Signaler" on any content or account, user blocking (immediate, bidirectional), automatic server-side pre-publication filter on all user content, human moderation]
+    stated_sla: 'RenooLab s''engage à examiner les signalements et à prendre les mesures appropriées sous 24 heures'
+    actions: [content removal, temporary or permanent account suspension]
+    evidence:
+    - source: https://renoolab.fr/cgu/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Signalement : tout utilisateur peut signaler un contenu ou un compte qu''il juge inapproprié via le menu « Signaler » disponible dans le Service. [...] Modération : RenooLab s''engage à examiner les signalements et à prendre les mesures appropriées sous 24 heures : suppression du contenu, suspension temporaire ou définitive du compte.'
+    - source: https://renoolab.fr/support/
+      http_status: 200
+      fetched: '2026-09-19'
+      quote: 'Pour un contenu ou un comportement abusif, utilisez en priorité « Signaler » dans l''application afin de joindre l''élément exact.'
+    note: An in-product reporting flow with a stated review period, in the terms rather than on a dedicated /legal/report-content page (404). No statement of reasons or appeal process is published.
+absent_signals:
+  sbom: not published (never derived)
+  support_lifetime: no stated support period (CGU §11 disclaims continuous availability)
+  accessibility_conformance: no VPAT / conformance report (/accessibility 404)
+  training_data_summary: not applicable / not published
+  ai_transparency: 'CGU §15 and privacy §2 disclose how AI assistants may use the service and what data they pass, and the MCP docs disclose Google Maps grounding; this is agent-access disclosure, not an AI-generated-content or AI-interaction transparency statement, so it is not recorded as ai_transparency'
+  global_privacy_control: no GPC statement in the privacy policy (cookie consent banner only)
+  incident_notification: no breach-notification SLA published
+  age_assurance: none
+  transparency_report: none
+  exit_assistance: portability is named as a right but no export tooling or documentation exists

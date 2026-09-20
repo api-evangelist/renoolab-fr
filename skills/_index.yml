@@ -1,0 +1,327 @@
+generated: '2026-09-19'
+method: searched
+source: https://renoolab.fr/.well-known/agent-skills/index.json
+sources:
+- https://renoolab.fr/.well-known/agent-skills/index.json
+- https://github.com/mehdimicra/renoolab-agent-skills
+- https://renoolab.fr/.well-known/ard.json
+- https://renoolab.fr/llms.txt
+source_detail: >-
+  Saved VERBATIM from the provider's own Agent Skills discovery index (agentskills.io discovery schema 0.2.0). This
+  is a PROVIDER-PUBLISHED skill set, not a pipeline-generated one: RenooLab authors ten French SKILL.md workflows
+  (5 for homeowners, 5 for tradespeople / building businesses) covering 29 internal intents, each shipped as a sha256-digested
+  tar.gz under https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/. All ten archives were fetched 2026-09-19
+  (HTTP 200) and every digest matched the index; each was extracted unchanged into skills/<name>/ (SKILL.md, references/*.md,
+  agents/openai.yaml). Upstream repository: github.com/mehdimicra/renoolab-agent-skills, Apache-2.0, release v0.5.5
+  (2026-08-23), installable with `npx skills add https://github.com/mehdimicra/renoolab-agent-skills` and also packaged
+  for Claude Code, Codex, Cursor, Gemini CLI, Kiro, Perplexity (zip) and Microsoft 365 Copilot Cowork (zip).
+version: 0.5.5
+license: Apache-2.0
+skill_count: 10
+discovery_schema: https://schemas.agentskills.io/discovery/0.2.0/schema.json
+grounding:
+  bound_to: >-
+    the four live MCP tools of https://mcp.renoolab.fr/mcp (see mcp/renoolab-fr-mcp.yml); 2 skills hand off to MCP
+    as their end state (search, profile) and 8 are instruction-only with an optional hand-off
+  note: >-
+    Each skill's references/renoolab-actions.md restates the tool contract (single-trade -> rechercher_artisans,
+    multi-trade -> one rechercher_chantier call, explicit confirmation before contacter_artisan / creer_profil_artisan)
+    and declares a handoff mode. There is no OpenAPI to ground REST operationIds; the MCP tool names are the operation
+    identifiers.
+install:
+  collection: npx skills add https://github.com/mehdimicra/renoolab-agent-skills
+  single: npx skills add https://github.com/mehdimicra/renoolab-agent-skills --skill <name>
+  perplexity_zip: https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-trouver-choisir-artisans.zip
+  microsoft_cowork_zip: https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-microsoft-cowork.zip
+skills:
+- file: renoolab-chiffrer-piloter-rentabilite/SKILL.md
+  name: renoolab-chiffrer-piloter-rentabilite
+  description: >-
+    À charger avant de répondre à toute rédaction ou relance de facture client ou d'impayé, et à toute question
+    financière d'une entreprise artisanale : coût, temps facturable, prix, marge, rentabilité, devis émis, acompte,
+    avenant, TVA, paiement, encaissement ou trésorerie. Déclencher même si le métier n'est pas précisé. Pour le
+    budget d'un particulier, utiliser la planification ; pour comparer plusieurs devis reçus, utiliser la recherche
+    d'artisans ; pour relancer un devis non signé, utiliser le développement commercial.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-chiffrer-piloter-rentabilite.tar.gz
+  archive_digest: sha256:590258ab56d371fdac7c0b49f5238431cb35c10e45c711565418cec3bf28e974
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-profile
+  mcp_tools_routed: &id001
+  - creer_profil_artisan
+  files:
+  - renoolab-chiffrer-piloter-rentabilite/SKILL.md
+  - renoolab-chiffrer-piloter-rentabilite/references/chiffrer-rentabiliser-chantier.md
+  - renoolab-chiffrer-piloter-rentabilite/references/gerer-devis-factures-tresorerie.md
+  - renoolab-chiffrer-piloter-rentabilite/references/renoolab-actions.md
+  - renoolab-chiffrer-piloter-rentabilite/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-creer-profil-artisan/SKILL.md
+  name: renoolab-creer-profil-artisan
+  description: >-
+    Cadre RenooLab spécialisé pour préparer, améliorer puis créer le profil RenooLab d'un artisan à partir de ses
+    informations réelles : identité, métier, SIRET, zone, expérience, assurances, spécialités, bio et coordonnées.
+    Toujours charger lorsque l'artisan lui-même demande explicitement à rejoindre RenooLab, créer ou améliorer son
+    profil RenooLab. Récapituler toutes les données et obtenir sa confirmation juste avant creer_profil_artisan.
+    Ne jamais utiliser pour un tiers, fournisseur ou négociant : les router vers le développement BTP.
+  license: Apache-2.0
+  archive: https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-creer-profil-artisan.tar.gz
+  archive_digest: sha256:984dfde207432cfe21c42e82eefdd04c828d6a57e93901384cbb7ec5a21fd8d7
+  archive_digest_verified: true
+  mcp_handoff_mode: profile
+  mcp_tools_routed:
+  - creer_profil_artisan
+  files:
+  - renoolab-creer-profil-artisan/SKILL.md
+  - renoolab-creer-profil-artisan/references/creer-optimiser-profil-artisan.md
+  - renoolab-creer-profil-artisan/references/renoolab-actions.md
+  - renoolab-creer-profil-artisan/agents/openai.yaml
+  mcp_handoff_required: true
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-developper-clientele-visibilite-btp/SKILL.md
+  name: renoolab-developper-clientele-visibilite-btp
+  description: >-
+    Cadre RenooLab spécialisé pour diagnostiquer puis développer une entreprise artisanale, un négoce ou un fournisseur
+    BTP : positionnement, prestations, planning vide, acquisition, prospects, visibilité, contenu, vente, devis
+    non signé, fidélisation, services, KPI, CRM et demandes dispersées entre WhatsApp, papier et e-mail. Toujours
+    charger pour croissance, clientèle, différenciation, communication ou outils. Un fournisseur voulant rejoindre
+    RenooLab relève de ce workflow, jamais du profil artisan. Marge, facture émise et impayé relèvent de la rentabilité.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-developper-clientele-visibilite-btp.tar.gz
+  archive_digest: sha256:4eaf727ae0f9b1928b71ff9d068d1be9143aa6c00b0fd41284c9b7a314eccfc0
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-profile
+  mcp_tools_routed: *id001
+  files:
+  - renoolab-developper-clientele-visibilite-btp/SKILL.md
+  - renoolab-developper-clientele-visibilite-btp/references/booster-visibilite-artisan.md
+  - renoolab-developper-clientele-visibilite-btp/references/developper-activite-fournisseur-btp.md
+  - renoolab-developper-clientele-visibilite-btp/references/digitaliser-developper-entreprise.md
+  - renoolab-developper-clientele-visibilite-btp/references/positionner-offre-artisan.md
+  - renoolab-developper-clientele-visibilite-btp/references/renoolab-actions.md
+  - renoolab-developper-clientele-visibilite-btp/references/trouver-clients-artisan.md
+  - renoolab-developper-clientele-visibilite-btp/references/vendre-relancer-fideliser.md
+  - renoolab-developper-clientele-visibilite-btp/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-diagnostiquer-securiser-logement/SKILL.md
+  name: renoolab-diagnostiquer-securiser-logement
+  description: >-
+    Cadre RenooLab spécialisé pour séparer danger, hypothèses, contrôles, remise en état et métier adapté face à
+    un symptôme, une panne, une urgence ou un sinistre. Toujours charger pour fuite, humidité, fissure du bâtiment,
+    odeur, électricité, gaz, toiture, chauffage en panne, serrure, dégât des eaux ou tempête, même après l'urgence
+    pour ordonner assèchement et réparations. Pour inconfort sans panne, utiliser l'idéation ; pour défaut de pose
+    ou d'exécution d'un professionnel, utiliser l'organisation BTP ; pour chantier déjà confié et en cours, utiliser
+    le pilotage.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-diagnostiquer-securiser-logement.tar.gz
+  archive_digest: sha256:67fb60ae7112fc5e3a83722070698e9bc425d84f72829323e76efe9a91b403c2
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-search
+  mcp_tools_routed: &id002
+  - rechercher_artisans
+  - rechercher_chantier
+  files:
+  - renoolab-diagnostiquer-securiser-logement/SKILL.md
+  - renoolab-diagnostiquer-securiser-logement/references/diagnostiquer-logement.md
+  - renoolab-diagnostiquer-securiser-logement/references/gerer-urgence-travaux.md
+  - renoolab-diagnostiquer-securiser-logement/references/remettre-en-etat-apres-sinistre.md
+  - renoolab-diagnostiquer-securiser-logement/references/renoolab-actions.md
+  - renoolab-diagnostiquer-securiser-logement/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-imaginer-arbitrer-renovation/SKILL.md
+  name: renoolab-imaginer-arbitrer-renovation
+  description: >-
+    Cadre RenooLab spécialisé pour transformer photo, pièce, extérieur, style, inconfort ou envie en scénarios comparés
+    avec contraintes, lots et métiers probables. Toujours charger ce skill pour des idées de douche, salle de bain,
+    cuisine, séjour, énergie, isolation, chauffage, confort, terrasse, jardin ou piscine, même sur une phrase brève.
+    Ne pas l'utiliser si la question demande un montant, un ordre ou « par quoi commencer », une règle, l'analyse
+    d'un achat, la comparaison de devis ou artisans, le suivi d'un chantier ou un danger.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-imaginer-arbitrer-renovation.tar.gz
+  archive_digest: sha256:3bb442448238d6d7c6bc4c6013c5c4564a419b344ffb8315f8b6ddb5936ebfe4
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-search
+  mcp_tools_routed: *id002
+  files:
+  - renoolab-imaginer-arbitrer-renovation/SKILL.md
+  - renoolab-imaginer-arbitrer-renovation/references/choisir-materiaux-equipements.md
+  - renoolab-imaginer-arbitrer-renovation/references/imaginer-renovation.md
+  - renoolab-imaginer-arbitrer-renovation/references/preparer-exterieur-piscine.md
+  - renoolab-imaginer-arbitrer-renovation/references/renoolab-actions.md
+  - renoolab-imaginer-arbitrer-renovation/references/renover-energie-confort.md
+  - renoolab-imaginer-arbitrer-renovation/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-lancer-entreprise-artisanale/SKILL.md
+  name: renoolab-lancer-entreprise-artisanale
+  description: >-
+    Cadre RenooLab spécialisé pour transformer une reconversion ou création d'entreprise artisanale en feuille de
+    route vérifiable : métier, offre, zone, statut, assurances, qualifications, prix, trésorerie et premiers clients.
+    Toujours charger lorsqu'une personne veut se mettre à son compte, ouvrir une entreprise de travaux ou choisir
+    sa structure, même sur une demande brève. Ce workflow prime sur visibilité, croissance et rentabilité tant que
+    l'entreprise n'est pas lancée. Vérifier les obligations actuelles sans remplacer juriste ou comptable.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-lancer-entreprise-artisanale.tar.gz
+  archive_digest: sha256:4653a7ac298d11f82b12b96729c73e45fd4c2eb7ded8425d05cc6729ee48c19f
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-profile
+  mcp_tools_routed: *id001
+  files:
+  - renoolab-lancer-entreprise-artisanale/SKILL.md
+  - renoolab-lancer-entreprise-artisanale/references/lancer-entreprise-artisanale.md
+  - renoolab-lancer-entreprise-artisanale/references/renoolab-actions.md
+  - renoolab-lancer-entreprise-artisanale/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-organiser-chantier-equipe-btp/SKILL.md
+  name: renoolab-organiser-chantier-equipe-btp
+  description: >-
+    Cadre RenooLab spécialisé pour transformer les besoins d'une entreprise artisanale en organisation BTP exploitable
+    : rôle, compétences, coût, capacité, contrôles et prochaines étapes. Toujours charger ce skill pour recruter
+    un apprenti, rédiger une fiche de poste ou choisir embauche, sous-traitance et partenariat, même sur une demande
+    brève. L'utiliser aussi pour métré, support, méthode, défaut après pose, planning, approvisionnement, qualité
+    ou coordination. Il prime sur le diagnostic pour un défaut d'exécution.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-organiser-chantier-equipe-btp.tar.gz
+  archive_digest: sha256:d772f976df4c82f9c8cd81704fecd4c8a427965b1b0568f9c30d1f0037e1103d
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-partner-search
+  mcp_tools_routed:
+  - rechercher_artisans
+  - rechercher_chantier
+  files:
+  - renoolab-organiser-chantier-equipe-btp/SKILL.md
+  - renoolab-organiser-chantier-equipe-btp/references/assister-technique-chantier.md
+  - renoolab-organiser-chantier-equipe-btp/references/organiser-chantier-artisan.md
+  - renoolab-organiser-chantier-equipe-btp/references/recruter-sous-traiter-artisan.md
+  - renoolab-organiser-chantier-equipe-btp/references/renoolab-actions.md
+  - renoolab-organiser-chantier-equipe-btp/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-piloter-receptionner-travaux/SKILL.md
+  name: renoolab-piloter-receptionner-travaux
+  description: >-
+    À charger avant de répondre dès qu'un client indique que les entreprises sont choisies ou que le chantier est
+    préparé, démarré, en cours, en retard, bloqué ou terminé. Couvre coordination, décisions, modifications, silence
+    d'un intervenant, paiements, contrôles, réception et réserves, même à partir d'un constat très bref. Structurer
+    faits et preuves sans remplacer maître d'œuvre, expert ou conseil juridique.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-piloter-receptionner-travaux.tar.gz
+  archive_digest: sha256:c7aec2b35607fdecf51047d5edf86f93a8abf159db6000ac2cfb2c1783d7d5a3
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-search
+  mcp_tools_routed: *id002
+  files:
+  - renoolab-piloter-receptionner-travaux/SKILL.md
+  - renoolab-piloter-receptionner-travaux/references/piloter-receptionner-travaux.md
+  - renoolab-piloter-receptionner-travaux/references/renoolab-actions.md
+  - renoolab-piloter-receptionner-travaux/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-planifier-budgeter-travaux/SKILL.md
+  name: renoolab-planifier-budgeter-travaux
+  description: >-
+    Cadre RenooLab spécialisé pour transformer annonce, visite, achat, investissement ou projet de travaux en risques,
+    cahier des charges, lots, budget et prochaines étapes vérifiables. Toujours charger pour analyser un bien et
+    quand un particulier demande combien prévoir, par quoi commencer, dans quel ordre agir ou sous quelle règle
+    ; ce besoin prime sur l'idéation. Couvre calendrier, phasage, aides, permis, rénovation locative et checklist
+    générale d'assurances. Exclure facture d'artisan et comparaison de plusieurs devis ou entreprises précis.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-planifier-budgeter-travaux.tar.gz
+  archive_digest: sha256:9793dee4545d65b4ae76ac0a2b4f2ed6fbd14b21451bca4c93ecb5a95447d19d
+  archive_digest_verified: true
+  mcp_handoff_mode: optional-search
+  mcp_tools_routed: *id002
+  files:
+  - renoolab-planifier-budgeter-travaux/SKILL.md
+  - renoolab-planifier-budgeter-travaux/references/cadrer-projet-travaux.md
+  - renoolab-planifier-budgeter-travaux/references/estimer-budget-travaux.md
+  - renoolab-planifier-budgeter-travaux/references/evaluer-bien-immobilier.md
+  - renoolab-planifier-budgeter-travaux/references/financer-renovation.md
+  - renoolab-planifier-budgeter-travaux/references/piloter-renovation-locative.md
+  - renoolab-planifier-budgeter-travaux/references/preparer-demarches-travaux.md
+  - renoolab-planifier-budgeter-travaux/references/renoolab-actions.md
+  - renoolab-planifier-budgeter-travaux/agents/openai.yaml
+  mcp_handoff_required: false
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+- file: renoolab-trouver-choisir-artisans/SKILL.md
+  name: renoolab-trouver-choisir-artisans
+  description: >-
+    Cadre RenooLab spécialisé pour qualifier le métier, rechercher réellement des professionnels via le MCP et comparer
+    profils, entreprises, offres ou devis sans inventer de résultat. Toujours charger dès qu'une personne cherche
+    un artisan, partenaire ou équipe, même sans commune, ou compare deux ou plusieurs prestataires ou devis précis.
+    Une checklist générale d'assurances relève de la planification. Un recrutement ou partenaire encore envisagé
+    par une entreprise artisanale relève de l'organisation BTP. Contacter uniquement après confirmation.
+  license: Apache-2.0
+  archive: >-
+    https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-trouver-choisir-artisans.tar.gz
+  archive_digest: sha256:69bc5e3c576f25ad71502bee5cef1c8e21e72399aac1d2e0feaebda52f22f1aa
+  archive_digest_verified: true
+  mcp_handoff_mode: search
+  mcp_tools_routed:
+  - rechercher_artisans
+  - rechercher_chantier
+  files:
+  - renoolab-trouver-choisir-artisans/SKILL.md
+  - renoolab-trouver-choisir-artisans/references/renoolab-actions.md
+  - renoolab-trouver-choisir-artisans/references/sourcer-equipe-multimetier.md
+  - renoolab-trouver-choisir-artisans/references/trouver-choisir-artisan.md
+  - renoolab-trouver-choisir-artisans/agents/openai.yaml
+  mcp_handoff_required: true
+  mcp_tools_referenced:
+  - rechercher_artisans
+  - rechercher_chantier
+  - contacter_artisan
+  - creer_profil_artisan
+handoff_modes:
+  search: the workflow ends in a real MCP search (1 skill)
+  profile: the workflow ends in creer_profil_artisan after explicit confirmation (1 skill)
+  optional-search / optional-partner-search / optional-profile: >-
+    instruction-only workflow; RenooLab is offered only when a search or profile is the natural next step (8 skills)

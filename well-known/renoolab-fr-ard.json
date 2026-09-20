@@ -1,0 +1,3072 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "RenooLab",
+    "identifier": "renoolab.fr",
+    "documentationUrl": "https://renoolab.fr/mcp/"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:renoolab.fr:mcp:artisan-services",
+      "displayName": "RenooLab — artisans en France (MCP)",
+      "type": "application/mcp-server+json",
+      "description": "Serveur MCP officiel RenooLab pour rechercher un artisan ou constituer une équipe multi-métiers pour un chantier en France, contacter un professionnel sélectionné, ou créer gratuitement un profil artisan.",
+      "capabilities": [
+        "rechercher_artisans",
+        "rechercher_chantier",
+        "contacter_artisan",
+        "creer_profil_artisan"
+      ],
+      "tags": [
+        "mcp",
+        "local-services",
+        "building-trades",
+        "renovation",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "trouve-moi un plombier près de Marseille",
+        "une fuite se trouve sous la baignoire, quel artisan peut intervenir à Aix-en-Provence",
+        "cherche un électricien pour une panne à Rennes",
+        "trouve un plombier et un carreleur pour refaire une salle de bain à Lyon",
+        "je suis artisan et je veux créer gratuitement mon profil RenooLab"
+      ],
+      "version": "1.4.0",
+      "metadata": {
+        "registryId": "fr.renoolab/mcp",
+        "executionUrl": "https://mcp.renoolab.fr/mcp",
+        "authentication": "oauth2.1",
+        "language": "fr-FR",
+        "geographicCoverage": "France",
+        "manifestUrl": "https://renoolab.fr/.well-known/mcp.json"
+      },
+      "data": {
+        "name": "RenooLab",
+        "description": "Official RenooLab MCP server for single-trade searches, multi-trade renovation projects, moderated contact requests and free professional profiles in France.",
+        "url": "https://mcp.renoolab.fr/mcp",
+        "transport": "streamable-http",
+        "authentication": "oauth2.1",
+        "documentation": "https://renoolab.fr/mcp/",
+        "tools": [
+          {
+            "name": "rechercher_artisans",
+            "title": "Trouver un artisan pour des travaux en France",
+            "description": "Find up to five RenooLab profiles for one inferred or explicit trade within 30 km of a French commune. Clarifies ambiguous communes and may return attributed external listings when no RenooLab profile is available. Read-only.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "besoin": {
+                  "description": "Description naturelle du dépannage, des travaux ou de la rénovation. Le serveur déduit le métier lorsque possible.",
+                  "type": "string",
+                  "minLength": 3,
+                  "maxLength": 500
+                },
+                "metier": {
+                  "description": "Métier public si déjà connu, par exemple Plomberie, Électricité, Peinture ou Couverture/Toiture.",
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80
+                },
+                "ville": {
+                  "description": "Ville ou commune française où chercher. Peut être omise : le serveur demandera alors uniquement la commune. Si plusieurs communes portent ce nom, l’outil demandera un code postal ou un département.",
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100
+                },
+                "code_postal": {
+                  "description": "Code postal français facultatif pour préciser une commune homonyme, par exemple 39410.",
+                  "type": "string",
+                  "pattern": "^\\d{5}$"
+                },
+                "departement": {
+                  "description": "Code de département facultatif pour préciser une commune homonyme, par exemple 39, 2A ou 971.",
+                  "type": "string",
+                  "pattern": "^(?:0[1-9]|1\\d|2[1-9]|[3-8]\\d|9[0-5]|2A|2B|\\d{3})$"
+                },
+                "tracking": {
+                  "type": "object",
+                  "properties": {
+                    "channel": {
+                      "type": "string",
+                      "enum": [
+                        "direct",
+                        "a2a"
+                      ]
+                    },
+                    "client": {
+                      "type": "string",
+                      "enum": [
+                        "chatgpt",
+                        "claude",
+                        "gemini",
+                        "copilot",
+                        "other",
+                        "unknown"
+                      ]
+                    },
+                    "discovery": {
+                      "type": "string",
+                      "enum": [
+                        "first_party",
+                        "manual",
+                        "a2a_registry",
+                        "a2a_cards",
+                        "other",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "artisan_results",
+                    "search_needs_input",
+                    "external_grounded_results"
+                  ]
+                },
+                "artisans": {
+                  "maxItems": 5,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "artisan_id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "nom": {
+                        "type": "string"
+                      },
+                      "ville": {
+                        "type": "string"
+                      },
+                      "metiers": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "note": {
+                        "anyOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "nb_avis": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "distance_km": {
+                        "anyOf": [
+                          {
+                            "type": "number",
+                            "minimum": 0
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "avatar_url": {
+                        "anyOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "nb_photos": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "verifie": {
+                        "type": "boolean"
+                      },
+                      "medaille": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "bronze",
+                          "silver",
+                          "gold"
+                        ]
+                      },
+                      "profile_url": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "contact_url": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "artisan_id",
+                      "nom",
+                      "ville",
+                      "metiers",
+                      "note",
+                      "nb_avis",
+                      "distance_km",
+                      "avatar_url",
+                      "nb_photos",
+                      "verifie",
+                      "medaille",
+                      "profile_url",
+                      "contact_url"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "external_results": {
+                  "maxItems": 5,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source": {
+                        "type": "string",
+                        "const": "google_maps"
+                      },
+                      "citation_index": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "place_id": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{3,512}$"
+                      },
+                      "google_maps_url": {
+                        "type": "string",
+                        "maxLength": 2048,
+                        "format": "uri"
+                      },
+                      "attribution": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 500
+                          },
+                          "url": {
+                            "type": "string",
+                            "maxLength": 2048,
+                            "format": "uri"
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "contact_url": {
+                        "type": "string",
+                        "maxLength": 2048,
+                        "format": "uri"
+                      }
+                    },
+                    "required": [
+                      "source",
+                      "citation_index",
+                      "place_id",
+                      "google_maps_url",
+                      "attribution",
+                      "contact_url"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "widget_previews": {
+                  "type": "object",
+                  "properties": {
+                    "artisan_previews": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "photos": {
+                            "maxItems": 3,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "url": {
+                                  "type": "string",
+                                  "maxLength": 2048,
+                                  "format": "uri"
+                                },
+                                "thumbnail_url": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "maxLength": 2048,
+                                      "format": "uri"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "url",
+                                "thumbnail_url"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "photos"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "external_previews": {
+                      "maxItems": 5,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "place_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_-]{3,512}$"
+                          },
+                          "description": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 12,
+                                "maxLength": 180
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "rating": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 5
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "place_id",
+                          "description",
+                          "rating"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "artisan_previews",
+                    "external_previews"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Données publiques nettoyées pour le rendu du widget. Ne jamais les recopier dans la réponse texte."
+                },
+                "grounded_summary": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "metier": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "ville": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "message": {
+                  "type": "string"
+                },
+                "normalized_need": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "normalized_trade": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "coverage": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "none",
+                        "partial",
+                        "available",
+                        "external"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "required_input": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "ville",
+                        "metier",
+                        "city_disambiguation"
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "reason": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "ambiguous_city"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "trade_candidates": {
+                  "maxItems": 18,
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "city_candidates": {
+                  "maxItems": 15,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "ville": {
+                        "type": "string"
+                      },
+                      "code_insee": {
+                        "type": "string"
+                      },
+                      "departement": {
+                        "type": "string"
+                      },
+                      "codes_postaux": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "population": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "ville",
+                      "code_insee",
+                      "departement",
+                      "codes_postaux",
+                      "population"
+                    ],
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "required": [
+                "kind",
+                "artisans",
+                "external_results",
+                "grounded_summary",
+                "metier",
+                "ville",
+                "message",
+                "normalized_need",
+                "normalized_trade",
+                "coverage",
+                "required_input",
+                "reason",
+                "trade_candidates",
+                "city_candidates"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "additionalProperties": false
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": true
+            }
+          },
+          {
+            "name": "rechercher_chantier",
+            "title": "Trouver les artisans pour un chantier en France",
+            "description": "Find complete providers or a minimal combination of professionals for multiple confirmed trades within 50 km of one French commune. Clarifies ambiguous communes. Read-only.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "ville": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100
+                },
+                "metiers_confirmes": {
+                  "minItems": 1,
+                  "maxItems": 17,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 80
+                  }
+                },
+                "code_postal": {
+                  "type": "string",
+                  "pattern": "^\\d{5}$"
+                },
+                "departement": {
+                  "type": "string",
+                  "pattern": "^(?:0[1-9]|1\\d|2[1-9]|[3-8]\\d|9[0-5]|2A|2B|\\d{3})$"
+                },
+                "tracking": {
+                  "type": "object",
+                  "properties": {
+                    "channel": {
+                      "type": "string",
+                      "enum": [
+                        "direct",
+                        "a2a"
+                      ]
+                    },
+                    "client": {
+                      "type": "string",
+                      "enum": [
+                        "chatgpt",
+                        "claude",
+                        "gemini",
+                        "copilot",
+                        "other",
+                        "unknown"
+                      ]
+                    },
+                    "discovery": {
+                      "type": "string",
+                      "enum": [
+                        "first_party",
+                        "manual",
+                        "a2a_registry",
+                        "a2a_cards",
+                        "other",
+                        "unknown"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "ville",
+                "metiers_confirmes"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "chantier_results",
+                    "search_needs_input"
+                  ]
+                },
+                "ville": {
+                  "type": "string"
+                },
+                "metiers_demandes": {
+                  "minItems": 2,
+                  "maxItems": 17,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "Plomberie",
+                      "Électricité",
+                      "Maçonnerie",
+                      "Carrelage",
+                      "Peinture",
+                      "Plâtrerie/Plaquiste",
+                      "Isolation",
+                      "Menuiserie",
+                      "Parquet",
+                      "Charpente",
+                      "Couverture/Toiture",
+                      "Chauffage/Climatisation",
+                      "Serrurerie",
+                      "Paysagiste",
+                      "Pisciniste",
+                      "Décoration d'intérieur",
+                      "Nettoyage"
+                    ]
+                  }
+                },
+                "rayon_km": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 30
+                    },
+                    {
+                      "type": "number",
+                      "const": 50
+                    }
+                  ]
+                },
+                "coverage": {
+                  "type": "string",
+                  "enum": [
+                    "single_provider_explicit",
+                    "single_provider_general",
+                    "hybrid",
+                    "minimal_combination",
+                    "partial",
+                    "none"
+                  ]
+                },
+                "solutions_completes": {
+                  "maxItems": 3,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "artisan": {
+                        "type": "object",
+                        "properties": {
+                          "artisan_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "nom": {
+                            "type": "string"
+                          },
+                          "ville": {
+                            "type": "string"
+                          },
+                          "metiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "nb_avis": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "distance_km": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "avatar_url": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "nb_photos": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "verifie": {
+                            "type": "boolean"
+                          },
+                          "medaille": {
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "bronze",
+                              "silver",
+                              "gold"
+                            ]
+                          },
+                          "profile_url": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "contact_url": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        },
+                        "required": [
+                          "artisan_id",
+                          "nom",
+                          "ville",
+                          "metiers",
+                          "note",
+                          "nb_avis",
+                          "distance_km",
+                          "avatar_url",
+                          "nb_photos",
+                          "verifie",
+                          "medaille",
+                          "profile_url",
+                          "contact_url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "coverage_basis": {
+                        "type": "string",
+                        "enum": [
+                          "declared",
+                          "renovation_generale"
+                        ]
+                      },
+                      "metiers_couverts": {
+                        "minItems": 1,
+                        "maxItems": 17,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "Plomberie",
+                            "Électricité",
+                            "Maçonnerie",
+                            "Carrelage",
+                            "Peinture",
+                            "Plâtrerie/Plaquiste",
+                            "Isolation",
+                            "Menuiserie",
+                            "Parquet",
+                            "Charpente",
+                            "Couverture/Toiture",
+                            "Chauffage/Climatisation",
+                            "Serrurerie",
+                            "Paysagiste",
+                            "Pisciniste",
+                            "Décoration d'intérieur",
+                            "Nettoyage"
+                          ]
+                        }
+                      },
+                      "metiers_a_confirmer": {
+                        "maxItems": 17,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "Plomberie",
+                            "Électricité",
+                            "Maçonnerie",
+                            "Carrelage",
+                            "Peinture",
+                            "Plâtrerie/Plaquiste",
+                            "Isolation",
+                            "Menuiserie",
+                            "Parquet",
+                            "Charpente",
+                            "Couverture/Toiture",
+                            "Chauffage/Climatisation",
+                            "Serrurerie",
+                            "Paysagiste",
+                            "Pisciniste",
+                            "Décoration d'intérieur",
+                            "Nettoyage"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "artisan",
+                      "coverage_basis",
+                      "metiers_couverts",
+                      "metiers_a_confirmer"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "combinaison_recommandee": {
+                  "maxItems": 6,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "artisan": {
+                        "type": "object",
+                        "properties": {
+                          "artisan_id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "nom": {
+                            "type": "string"
+                          },
+                          "ville": {
+                            "type": "string"
+                          },
+                          "metiers": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "note": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "nb_avis": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "distance_km": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "avatar_url": {
+                            "anyOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "nb_photos": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "verifie": {
+                            "type": "boolean"
+                          },
+                          "medaille": {
+                            "type": "string",
+                            "enum": [
+                              "none",
+                              "bronze",
+                              "silver",
+                              "gold"
+                            ]
+                          },
+                          "profile_url": {
+                            "type": "string",
+                            "format": "uri"
+                          },
+                          "contact_url": {
+                            "type": "string",
+                            "format": "uri"
+                          }
+                        },
+                        "required": [
+                          "artisan_id",
+                          "nom",
+                          "ville",
+                          "metiers",
+                          "note",
+                          "nb_avis",
+                          "distance_km",
+                          "avatar_url",
+                          "nb_photos",
+                          "verifie",
+                          "medaille",
+                          "profile_url",
+                          "contact_url"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "coverage_basis": {
+                        "type": "string",
+                        "enum": [
+                          "declared",
+                          "renovation_generale"
+                        ]
+                      },
+                      "metiers_couverts": {
+                        "minItems": 1,
+                        "maxItems": 17,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "Plomberie",
+                            "Électricité",
+                            "Maçonnerie",
+                            "Carrelage",
+                            "Peinture",
+                            "Plâtrerie/Plaquiste",
+                            "Isolation",
+                            "Menuiserie",
+                            "Parquet",
+                            "Charpente",
+                            "Couverture/Toiture",
+                            "Chauffage/Climatisation",
+                            "Serrurerie",
+                            "Paysagiste",
+                            "Pisciniste",
+                            "Décoration d'intérieur",
+                            "Nettoyage"
+                          ]
+                        }
+                      },
+                      "metiers_a_confirmer": {
+                        "maxItems": 17,
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "Plomberie",
+                            "Électricité",
+                            "Maçonnerie",
+                            "Carrelage",
+                            "Peinture",
+                            "Plâtrerie/Plaquiste",
+                            "Isolation",
+                            "Menuiserie",
+                            "Parquet",
+                            "Charpente",
+                            "Couverture/Toiture",
+                            "Chauffage/Climatisation",
+                            "Serrurerie",
+                            "Paysagiste",
+                            "Pisciniste",
+                            "Décoration d'intérieur",
+                            "Nettoyage"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "artisan",
+                      "coverage_basis",
+                      "metiers_couverts",
+                      "metiers_a_confirmer"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "alternatives_par_metier": {
+                  "maxItems": 17,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "metier": {
+                        "type": "string",
+                        "enum": [
+                          "Plomberie",
+                          "Électricité",
+                          "Maçonnerie",
+                          "Carrelage",
+                          "Peinture",
+                          "Plâtrerie/Plaquiste",
+                          "Isolation",
+                          "Menuiserie",
+                          "Parquet",
+                          "Charpente",
+                          "Couverture/Toiture",
+                          "Chauffage/Climatisation",
+                          "Serrurerie",
+                          "Paysagiste",
+                          "Pisciniste",
+                          "Décoration d'intérieur",
+                          "Nettoyage"
+                        ]
+                      },
+                      "artisan": {
+                        "type": "object",
+                        "properties": {
+                          "artisan": {
+                            "type": "object",
+                            "properties": {
+                              "artisan_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "nom": {
+                                "type": "string"
+                              },
+                              "ville": {
+                                "type": "string"
+                              },
+                              "metiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "note": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nb_avis": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "distance_km": {
+                                "anyOf": [
+                                  {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "avatar_url": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nb_photos": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "verifie": {
+                                "type": "boolean"
+                              },
+                              "medaille": {
+                                "type": "string",
+                                "enum": [
+                                  "none",
+                                  "bronze",
+                                  "silver",
+                                  "gold"
+                                ]
+                              },
+                              "profile_url": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "contact_url": {
+                                "type": "string",
+                                "format": "uri"
+                              }
+                            },
+                            "required": [
+                              "artisan_id",
+                              "nom",
+                              "ville",
+                              "metiers",
+                              "note",
+                              "nb_avis",
+                              "distance_km",
+                              "avatar_url",
+                              "nb_photos",
+                              "verifie",
+                              "medaille",
+                              "profile_url",
+                              "contact_url"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "coverage_basis": {
+                            "type": "string",
+                            "enum": [
+                              "declared",
+                              "renovation_generale"
+                            ]
+                          },
+                          "metiers_couverts": {
+                            "minItems": 1,
+                            "maxItems": 17,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Plomberie",
+                                "Électricité",
+                                "Maçonnerie",
+                                "Carrelage",
+                                "Peinture",
+                                "Plâtrerie/Plaquiste",
+                                "Isolation",
+                                "Menuiserie",
+                                "Parquet",
+                                "Charpente",
+                                "Couverture/Toiture",
+                                "Chauffage/Climatisation",
+                                "Serrurerie",
+                                "Paysagiste",
+                                "Pisciniste",
+                                "Décoration d'intérieur",
+                                "Nettoyage"
+                              ]
+                            }
+                          },
+                          "metiers_a_confirmer": {
+                            "maxItems": 17,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Plomberie",
+                                "Électricité",
+                                "Maçonnerie",
+                                "Carrelage",
+                                "Peinture",
+                                "Plâtrerie/Plaquiste",
+                                "Isolation",
+                                "Menuiserie",
+                                "Parquet",
+                                "Charpente",
+                                "Couverture/Toiture",
+                                "Chauffage/Climatisation",
+                                "Serrurerie",
+                                "Paysagiste",
+                                "Pisciniste",
+                                "Décoration d'intérieur",
+                                "Nettoyage"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "artisan",
+                          "coverage_basis",
+                          "metiers_couverts",
+                          "metiers_a_confirmer"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "metier",
+                      "artisan"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "metiers_non_couverts": {
+                  "maxItems": 17,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "Plomberie",
+                      "Électricité",
+                      "Maçonnerie",
+                      "Carrelage",
+                      "Peinture",
+                      "Plâtrerie/Plaquiste",
+                      "Isolation",
+                      "Menuiserie",
+                      "Parquet",
+                      "Charpente",
+                      "Couverture/Toiture",
+                      "Chauffage/Climatisation",
+                      "Serrurerie",
+                      "Paysagiste",
+                      "Pisciniste",
+                      "Décoration d'intérieur",
+                      "Nettoyage"
+                    ]
+                  }
+                },
+                "message": {
+                  "type": "string"
+                },
+                "avertissements": {
+                  "maxItems": 4,
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "widget_previews": {
+                  "type": "object",
+                  "properties": {
+                    "artisan_previews": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string",
+                        "format": "uuid",
+                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "photos": {
+                            "maxItems": 3,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "url": {
+                                  "type": "string",
+                                  "maxLength": 2048,
+                                  "format": "uri"
+                                },
+                                "thumbnail_url": {
+                                  "anyOf": [
+                                    {
+                                      "type": "string",
+                                      "maxLength": 2048,
+                                      "format": "uri"
+                                    },
+                                    {
+                                      "type": "null"
+                                    }
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "url",
+                                "thumbnail_url"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "photos"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "external_previews": {
+                      "maxItems": 5,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "place_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_-]{3,512}$"
+                          },
+                          "description": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 12,
+                                "maxLength": 180
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "rating": {
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 5
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "place_id",
+                          "description",
+                          "rating"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "artisan_previews",
+                    "external_previews"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Données publiques nettoyées pour le rendu du widget. Ne jamais les recopier dans la réponse texte."
+                },
+                "required_input": {
+                  "type": "string",
+                  "enum": [
+                    "city_disambiguation",
+                    "metiers_prioritaires"
+                  ]
+                },
+                "question": {
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string",
+                  "const": "ambiguous_city"
+                },
+                "city_candidates": {
+                  "maxItems": 15,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "ville": {
+                        "type": "string"
+                      },
+                      "code_insee": {
+                        "type": "string"
+                      },
+                      "departement": {
+                        "type": "string"
+                      },
+                      "codes_postaux": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "population": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "ville",
+                      "code_insee",
+                      "departement",
+                      "codes_postaux",
+                      "population"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "metiers_recus": {
+                  "minItems": 2,
+                  "maxItems": 17,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "Plomberie",
+                      "Électricité",
+                      "Maçonnerie",
+                      "Carrelage",
+                      "Peinture",
+                      "Plâtrerie/Plaquiste",
+                      "Isolation",
+                      "Menuiserie",
+                      "Parquet",
+                      "Charpente",
+                      "Couverture/Toiture",
+                      "Chauffage/Climatisation",
+                      "Serrurerie",
+                      "Paysagiste",
+                      "Pisciniste",
+                      "Décoration d'intérieur",
+                      "Nettoyage"
+                    ]
+                  }
+                },
+                "max_selections": {
+                  "type": "number",
+                  "const": 6
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "additionalProperties": false,
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "chantier_results"
+                    },
+                    "ville": {
+                      "type": "string"
+                    },
+                    "metiers_demandes": {
+                      "minItems": 2,
+                      "maxItems": 17,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "Plomberie",
+                          "Électricité",
+                          "Maçonnerie",
+                          "Carrelage",
+                          "Peinture",
+                          "Plâtrerie/Plaquiste",
+                          "Isolation",
+                          "Menuiserie",
+                          "Parquet",
+                          "Charpente",
+                          "Couverture/Toiture",
+                          "Chauffage/Climatisation",
+                          "Serrurerie",
+                          "Paysagiste",
+                          "Pisciniste",
+                          "Décoration d'intérieur",
+                          "Nettoyage"
+                        ]
+                      }
+                    },
+                    "rayon_km": {
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "const": 30
+                        },
+                        {
+                          "type": "number",
+                          "const": 50
+                        }
+                      ]
+                    },
+                    "coverage": {
+                      "type": "string",
+                      "enum": [
+                        "single_provider_explicit",
+                        "single_provider_general",
+                        "hybrid",
+                        "minimal_combination",
+                        "partial",
+                        "none"
+                      ]
+                    },
+                    "solutions_completes": {
+                      "maxItems": 3,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "artisan": {
+                            "type": "object",
+                            "properties": {
+                              "artisan_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "nom": {
+                                "type": "string"
+                              },
+                              "ville": {
+                                "type": "string"
+                              },
+                              "metiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "note": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nb_avis": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "distance_km": {
+                                "anyOf": [
+                                  {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "avatar_url": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nb_photos": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "verifie": {
+                                "type": "boolean"
+                              },
+                              "medaille": {
+                                "type": "string",
+                                "enum": [
+                                  "none",
+                                  "bronze",
+                                  "silver",
+                                  "gold"
+                                ]
+                              },
+                              "profile_url": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "contact_url": {
+                                "type": "string",
+                                "format": "uri"
+                              }
+                            },
+                            "required": [
+                              "artisan_id",
+                              "nom",
+                              "ville",
+                              "metiers",
+                              "note",
+                              "nb_avis",
+                              "distance_km",
+                              "avatar_url",
+                              "nb_photos",
+                              "verifie",
+                              "medaille",
+                              "profile_url",
+                              "contact_url"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "coverage_basis": {
+                            "type": "string",
+                            "enum": [
+                              "declared",
+                              "renovation_generale"
+                            ]
+                          },
+                          "metiers_couverts": {
+                            "minItems": 1,
+                            "maxItems": 17,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Plomberie",
+                                "Électricité",
+                                "Maçonnerie",
+                                "Carrelage",
+                                "Peinture",
+                                "Plâtrerie/Plaquiste",
+                                "Isolation",
+                                "Menuiserie",
+                                "Parquet",
+                                "Charpente",
+                                "Couverture/Toiture",
+                                "Chauffage/Climatisation",
+                                "Serrurerie",
+                                "Paysagiste",
+                                "Pisciniste",
+                                "Décoration d'intérieur",
+                                "Nettoyage"
+                              ]
+                            }
+                          },
+                          "metiers_a_confirmer": {
+                            "maxItems": 17,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Plomberie",
+                                "Électricité",
+                                "Maçonnerie",
+                                "Carrelage",
+                                "Peinture",
+                                "Plâtrerie/Plaquiste",
+                                "Isolation",
+                                "Menuiserie",
+                                "Parquet",
+                                "Charpente",
+                                "Couverture/Toiture",
+                                "Chauffage/Climatisation",
+                                "Serrurerie",
+                                "Paysagiste",
+                                "Pisciniste",
+                                "Décoration d'intérieur",
+                                "Nettoyage"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "artisan",
+                          "coverage_basis",
+                          "metiers_couverts",
+                          "metiers_a_confirmer"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "combinaison_recommandee": {
+                      "maxItems": 6,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "artisan": {
+                            "type": "object",
+                            "properties": {
+                              "artisan_id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              "nom": {
+                                "type": "string"
+                              },
+                              "ville": {
+                                "type": "string"
+                              },
+                              "metiers": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "note": {
+                                "anyOf": [
+                                  {
+                                    "type": "number"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nb_avis": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "distance_km": {
+                                "anyOf": [
+                                  {
+                                    "type": "number",
+                                    "minimum": 0
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "avatar_url": {
+                                "anyOf": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "nb_photos": {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              "verifie": {
+                                "type": "boolean"
+                              },
+                              "medaille": {
+                                "type": "string",
+                                "enum": [
+                                  "none",
+                                  "bronze",
+                                  "silver",
+                                  "gold"
+                                ]
+                              },
+                              "profile_url": {
+                                "type": "string",
+                                "format": "uri"
+                              },
+                              "contact_url": {
+                                "type": "string",
+                                "format": "uri"
+                              }
+                            },
+                            "required": [
+                              "artisan_id",
+                              "nom",
+                              "ville",
+                              "metiers",
+                              "note",
+                              "nb_avis",
+                              "distance_km",
+                              "avatar_url",
+                              "nb_photos",
+                              "verifie",
+                              "medaille",
+                              "profile_url",
+                              "contact_url"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "coverage_basis": {
+                            "type": "string",
+                            "enum": [
+                              "declared",
+                              "renovation_generale"
+                            ]
+                          },
+                          "metiers_couverts": {
+                            "minItems": 1,
+                            "maxItems": 17,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Plomberie",
+                                "Électricité",
+                                "Maçonnerie",
+                                "Carrelage",
+                                "Peinture",
+                                "Plâtrerie/Plaquiste",
+                                "Isolation",
+                                "Menuiserie",
+                                "Parquet",
+                                "Charpente",
+                                "Couverture/Toiture",
+                                "Chauffage/Climatisation",
+                                "Serrurerie",
+                                "Paysagiste",
+                                "Pisciniste",
+                                "Décoration d'intérieur",
+                                "Nettoyage"
+                              ]
+                            }
+                          },
+                          "metiers_a_confirmer": {
+                            "maxItems": 17,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Plomberie",
+                                "Électricité",
+                                "Maçonnerie",
+                                "Carrelage",
+                                "Peinture",
+                                "Plâtrerie/Plaquiste",
+                                "Isolation",
+                                "Menuiserie",
+                                "Parquet",
+                                "Charpente",
+                                "Couverture/Toiture",
+                                "Chauffage/Climatisation",
+                                "Serrurerie",
+                                "Paysagiste",
+                                "Pisciniste",
+                                "Décoration d'intérieur",
+                                "Nettoyage"
+                              ]
+                            }
+                          }
+                        },
+                        "required": [
+                          "artisan",
+                          "coverage_basis",
+                          "metiers_couverts",
+                          "metiers_a_confirmer"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "alternatives_par_metier": {
+                      "maxItems": 17,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "metier": {
+                            "type": "string",
+                            "enum": [
+                              "Plomberie",
+                              "Électricité",
+                              "Maçonnerie",
+                              "Carrelage",
+                              "Peinture",
+                              "Plâtrerie/Plaquiste",
+                              "Isolation",
+                              "Menuiserie",
+                              "Parquet",
+                              "Charpente",
+                              "Couverture/Toiture",
+                              "Chauffage/Climatisation",
+                              "Serrurerie",
+                              "Paysagiste",
+                              "Pisciniste",
+                              "Décoration d'intérieur",
+                              "Nettoyage"
+                            ]
+                          },
+                          "artisan": {
+                            "type": "object",
+                            "properties": {
+                              "artisan": {
+                                "type": "object",
+                                "properties": {
+                                  "artisan_id": {
+                                    "type": "string",
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                                  },
+                                  "nom": {
+                                    "type": "string"
+                                  },
+                                  "ville": {
+                                    "type": "string"
+                                  },
+                                  "metiers": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "note": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "nb_avis": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "distance_km": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number",
+                                        "minimum": 0
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "avatar_url": {
+                                    "anyOf": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "nb_photos": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 9007199254740991
+                                  },
+                                  "verifie": {
+                                    "type": "boolean"
+                                  },
+                                  "medaille": {
+                                    "type": "string",
+                                    "enum": [
+                                      "none",
+                                      "bronze",
+                                      "silver",
+                                      "gold"
+                                    ]
+                                  },
+                                  "profile_url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  },
+                                  "contact_url": {
+                                    "type": "string",
+                                    "format": "uri"
+                                  }
+                                },
+                                "required": [
+                                  "artisan_id",
+                                  "nom",
+                                  "ville",
+                                  "metiers",
+                                  "note",
+                                  "nb_avis",
+                                  "distance_km",
+                                  "avatar_url",
+                                  "nb_photos",
+                                  "verifie",
+                                  "medaille",
+                                  "profile_url",
+                                  "contact_url"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "coverage_basis": {
+                                "type": "string",
+                                "enum": [
+                                  "declared",
+                                  "renovation_generale"
+                                ]
+                              },
+                              "metiers_couverts": {
+                                "minItems": 1,
+                                "maxItems": 17,
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": [
+                                    "Plomberie",
+                                    "Électricité",
+                                    "Maçonnerie",
+                                    "Carrelage",
+                                    "Peinture",
+                                    "Plâtrerie/Plaquiste",
+                                    "Isolation",
+                                    "Menuiserie",
+                                    "Parquet",
+                                    "Charpente",
+                                    "Couverture/Toiture",
+                                    "Chauffage/Climatisation",
+                                    "Serrurerie",
+                                    "Paysagiste",
+                                    "Pisciniste",
+                                    "Décoration d'intérieur",
+                                    "Nettoyage"
+                                  ]
+                                }
+                              },
+                              "metiers_a_confirmer": {
+                                "maxItems": 17,
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": [
+                                    "Plomberie",
+                                    "Électricité",
+                                    "Maçonnerie",
+                                    "Carrelage",
+                                    "Peinture",
+                                    "Plâtrerie/Plaquiste",
+                                    "Isolation",
+                                    "Menuiserie",
+                                    "Parquet",
+                                    "Charpente",
+                                    "Couverture/Toiture",
+                                    "Chauffage/Climatisation",
+                                    "Serrurerie",
+                                    "Paysagiste",
+                                    "Pisciniste",
+                                    "Décoration d'intérieur",
+                                    "Nettoyage"
+                                  ]
+                                }
+                              }
+                            },
+                            "required": [
+                              "artisan",
+                              "coverage_basis",
+                              "metiers_couverts",
+                              "metiers_a_confirmer"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "metier",
+                          "artisan"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "metiers_non_couverts": {
+                      "maxItems": 17,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "Plomberie",
+                          "Électricité",
+                          "Maçonnerie",
+                          "Carrelage",
+                          "Peinture",
+                          "Plâtrerie/Plaquiste",
+                          "Isolation",
+                          "Menuiserie",
+                          "Parquet",
+                          "Charpente",
+                          "Couverture/Toiture",
+                          "Chauffage/Climatisation",
+                          "Serrurerie",
+                          "Paysagiste",
+                          "Pisciniste",
+                          "Décoration d'intérieur",
+                          "Nettoyage"
+                        ]
+                      }
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "avertissements": {
+                      "maxItems": 4,
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "widget_previews": {
+                      "type": "object",
+                      "properties": {
+                        "artisan_previews": {
+                          "type": "object",
+                          "propertyNames": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                              "photos": {
+                                "maxItems": 3,
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": {
+                                    "url": {
+                                      "type": "string",
+                                      "maxLength": 2048,
+                                      "format": "uri"
+                                    },
+                                    "thumbnail_url": {
+                                      "anyOf": [
+                                        {
+                                          "type": "string",
+                                          "maxLength": 2048,
+                                          "format": "uri"
+                                        },
+                                        {
+                                          "type": "null"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "url",
+                                    "thumbnail_url"
+                                  ],
+                                  "additionalProperties": false
+                                }
+                              }
+                            },
+                            "required": [
+                              "photos"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "external_previews": {
+                          "maxItems": 5,
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "place_id": {
+                                "type": "string",
+                                "pattern": "^[A-Za-z0-9_-]{3,512}$"
+                              },
+                              "description": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "minLength": 12,
+                                    "maxLength": 180
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              },
+                              "rating": {
+                                "anyOf": [
+                                  {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 5
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "place_id",
+                              "description",
+                              "rating"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "artisan_previews",
+                        "external_previews"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Données publiques nettoyées pour le rendu du widget. Ne jamais les recopier dans la réponse texte."
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "ville",
+                    "metiers_demandes",
+                    "rayon_km",
+                    "coverage",
+                    "solutions_completes",
+                    "combinaison_recommandee",
+                    "alternatives_par_metier",
+                    "metiers_non_couverts",
+                    "message",
+                    "avertissements",
+                    "widget_previews"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "search_needs_input"
+                    },
+                    "required_input": {
+                      "type": "string",
+                      "const": "city_disambiguation"
+                    },
+                    "metiers_recus": {
+                      "minItems": 2,
+                      "maxItems": 17,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "Plomberie",
+                          "Électricité",
+                          "Maçonnerie",
+                          "Carrelage",
+                          "Peinture",
+                          "Plâtrerie/Plaquiste",
+                          "Isolation",
+                          "Menuiserie",
+                          "Parquet",
+                          "Charpente",
+                          "Couverture/Toiture",
+                          "Chauffage/Climatisation",
+                          "Serrurerie",
+                          "Paysagiste",
+                          "Pisciniste",
+                          "Décoration d'intérieur",
+                          "Nettoyage"
+                        ]
+                      }
+                    },
+                    "question": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "const": "ambiguous_city"
+                    },
+                    "city_candidates": {
+                      "maxItems": 15,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ville": {
+                            "type": "string"
+                          },
+                          "code_insee": {
+                            "type": "string"
+                          },
+                          "departement": {
+                            "type": "string"
+                          },
+                          "codes_postaux": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "population": {
+                            "anyOf": [
+                              {
+                                "type": "integer",
+                                "minimum": 0,
+                                "maximum": 9007199254740991
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "ville",
+                          "code_insee",
+                          "departement",
+                          "codes_postaux",
+                          "population"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "required_input",
+                    "metiers_recus",
+                    "question",
+                    "reason",
+                    "city_candidates"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string",
+                      "const": "search_needs_input"
+                    },
+                    "required_input": {
+                      "type": "string",
+                      "const": "metiers_prioritaires"
+                    },
+                    "question": {
+                      "type": "string"
+                    },
+                    "metiers_recus": {
+                      "minItems": 7,
+                      "maxItems": 17,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": [
+                          "Plomberie",
+                          "Électricité",
+                          "Maçonnerie",
+                          "Carrelage",
+                          "Peinture",
+                          "Plâtrerie/Plaquiste",
+                          "Isolation",
+                          "Menuiserie",
+                          "Parquet",
+                          "Charpente",
+                          "Couverture/Toiture",
+                          "Chauffage/Climatisation",
+                          "Serrurerie",
+                          "Paysagiste",
+                          "Pisciniste",
+                          "Décoration d'intérieur",
+                          "Nettoyage"
+                        ]
+                      }
+                    },
+                    "max_selections": {
+                      "type": "number",
+                      "const": 6
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "required_input",
+                    "question",
+                    "metiers_recus",
+                    "max_selections"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "annotations": {
+              "readOnlyHint": true,
+              "destructiveHint": false,
+              "idempotentHint": true,
+              "openWorldHint": false
+            }
+          },
+          {
+            "name": "contacter_artisan",
+            "title": "Contacter un professionnel via RenooLab",
+            "description": "Submit a moderated contact request to one selected RenooLab profile or attributed external listing after explicit user confirmation.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "artisan_id": {
+                  "description": "UUID artisan_id exact renvoyé pour un membre RenooLab. Fournir exactement ce champ ou external_place_id, jamais les deux.",
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                },
+                "external_place_id": {
+                  "description": "Place ID exact renvoyé pour une fiche Google Maps. Fournir exactement ce champ ou artisan_id, jamais les deux.",
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_-]{3,512}$"
+                },
+                "nom": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 80,
+                  "description": "Nom du demandeur."
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 254,
+                  "format": "email",
+                  "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                  "description": "E-mail du demandeur."
+                },
+                "telephone": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 32,
+                  "description": "Mobile français 06/07 du demandeur, obligatoire pour le rappel."
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 5,
+                  "maxLength": 2000,
+                  "description": "Description de la demande ou des travaux."
+                }
+              },
+              "required": [
+                "nom",
+                "email",
+                "telephone",
+                "message"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "oneOf": [
+                {
+                  "required": [
+                    "artisan_id"
+                  ],
+                  "not": {
+                    "required": [
+                      "external_place_id"
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "external_place_id"
+                  ],
+                  "not": {
+                    "required": [
+                      "artisan_id"
+                    ]
+                  }
+                }
+              ]
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "contact_pending"
+                },
+                "titre": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "titre",
+                "message"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "additionalProperties": false
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": false
+            }
+          },
+          {
+            "name": "creer_profil_artisan",
+            "title": "Inscrire un artisan ou une entreprise du bâtiment",
+            "description": "Create an inactive free tradesperson profile after explicit professional consent; activation remains with the professional.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "nom_entreprise": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 120,
+                  "description": "Nom réel de l’entreprise artisanale."
+                },
+                "siret": {
+                  "description": "SIRET optionnel de 14 chiffres ; s’il est fourni, il est vérifié au registre SIRENE.",
+                  "type": "string",
+                  "pattern": "^\\d{14}$"
+                },
+                "metiers": {
+                  "minItems": 1,
+                  "maxItems": 18,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "Rénovation générale",
+                      "Plomberie",
+                      "Électricité",
+                      "Maçonnerie",
+                      "Carrelage",
+                      "Peinture",
+                      "Plâtrerie/Plaquiste",
+                      "Isolation",
+                      "Menuiserie",
+                      "Parquet",
+                      "Charpente",
+                      "Couverture/Toiture",
+                      "Chauffage/Climatisation",
+                      "Serrurerie",
+                      "Paysagiste",
+                      "Pisciniste",
+                      "Décoration d'intérieur",
+                      "Nettoyage"
+                    ]
+                  },
+                  "description": "Métiers exercés parmi les 18 métiers publics. Fournisseur est app-only."
+                },
+                "ville": {
+                  "type": "string",
+                  "minLength": 2,
+                  "maxLength": 100,
+                  "description": "Commune française d’implantation."
+                },
+                "email": {
+                  "type": "string",
+                  "maxLength": 254,
+                  "format": "email",
+                  "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+                  "description": "E-mail réel de l’artisan, qui recevra le lien d’activation."
+                },
+                "telephone": {
+                  "type": "string",
+                  "minLength": 10,
+                  "maxLength": 32,
+                  "description": "Mobile français 06/07 de l’artisan."
+                },
+                "bio": {
+                  "description": "Courte présentation de l’activité.",
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "nom_entreprise",
+                "metiers",
+                "ville",
+                "email",
+                "telephone"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "outputSchema": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "signup_created"
+                },
+                "titre": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "profil": {
+                  "type": "object",
+                  "properties": {
+                    "nom": {
+                      "type": "string"
+                    },
+                    "ville": {
+                      "type": "string"
+                    },
+                    "metiers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "nom",
+                    "ville",
+                    "metiers"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "kind",
+                "titre",
+                "message",
+                "profil"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#",
+              "additionalProperties": false
+            },
+            "annotations": {
+              "readOnlyHint": false,
+              "destructiveHint": true,
+              "idempotentHint": false,
+              "openWorldHint": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-chiffrer-piloter-rentabilite",
+      "displayName": "Chiffrer et piloter la rentabilité artisanale",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-chiffrer-piloter-rentabilite.tar.gz",
+      "description": "Skill RenooLab pour calculer les coûts, prix, marges, devis, acomptes, factures, impayés et la trésorerie d’une entreprise artisanale du bâtiment.",
+      "capabilities": [
+        "cost-estimation",
+        "pricing",
+        "margin-management",
+        "invoicing",
+        "cash-flow"
+      ],
+      "tags": [
+        "agent-skill",
+        "building-trades",
+        "business-finance",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "combien dois-je facturer ce chantier pour garder une marge correcte",
+        "aide-moi à relancer une facture impayée d’un client",
+        "calcule mon taux horaire et le prix de ce devis"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-chiffrer-piloter-rentabilite",
+        "digest": "sha256:590258ab56d371fdac7c0b49f5238431cb35c10e45c711565418cec3bf28e974",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-creer-profil-artisan",
+      "displayName": "Créer un profil artisan RenooLab",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-creer-profil-artisan.tar.gz",
+      "description": "Skill RenooLab pour préparer, vérifier et créer avec l’accord du professionnel un profil artisan gratuit, inactif jusqu’à son activation par e-mail.",
+      "capabilities": [
+        "artisan-profile-preparation",
+        "artisan-signup",
+        "business-verification"
+      ],
+      "tags": [
+        "agent-skill",
+        "artisan-signup",
+        "local-business",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "je suis plombier et je veux créer gratuitement mon profil RenooLab",
+        "aide-moi à préparer une bonne présentation pour ma fiche artisan",
+        "inscris mon entreprise artisanale sur RenooLab avec mon accord"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-creer-profil-artisan",
+        "digest": "sha256:984dfde207432cfe21c42e82eefdd04c828d6a57e93901384cbb7ec5a21fd8d7",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-developper-clientele-visibilite-btp",
+      "displayName": "Développer la clientèle et la visibilité BTP",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-developper-clientele-visibilite-btp.tar.gz",
+      "description": "Skill RenooLab pour améliorer le positionnement, la prospection, la visibilité locale, le suivi commercial et la fidélisation d’une entreprise ou d’un fournisseur BTP.",
+      "capabilities": [
+        "customer-acquisition",
+        "local-visibility",
+        "sales-follow-up",
+        "btp-crm"
+      ],
+      "tags": [
+        "agent-skill",
+        "building-trades",
+        "marketing",
+        "sales",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "comment trouver plus de clients locaux sans payer de commission",
+        "aide-moi à relancer un devis envoyé mais pas encore signé",
+        "organise mes prospects artisans entre WhatsApp e-mail et papier"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-developper-clientele-visibilite-btp",
+        "digest": "sha256:4eaf727ae0f9b1928b71ff9d068d1be9143aa6c00b0fd41284c9b7a314eccfc0",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-diagnostiquer-securiser-logement",
+      "displayName": "Diagnostiquer et sécuriser un logement",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-diagnostiquer-securiser-logement.tar.gz",
+      "description": "Skill RenooLab pour trier les dangers, formuler des hypothèses prudentes, organiser les contrôles et identifier le bon métier face à une panne ou un sinistre.",
+      "capabilities": [
+        "home-safety-triage",
+        "repair-diagnosis",
+        "trade-routing",
+        "damage-response"
+      ],
+      "tags": [
+        "agent-skill",
+        "home-safety",
+        "repair",
+        "renovation",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "j’ai une fuite sous la baignoire que dois-je sécuriser en premier",
+        "une fissure vient d’apparaître sur mon mur est-ce dangereux",
+        "mon tableau électrique saute quel professionnel dois-je appeler"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-diagnostiquer-securiser-logement",
+        "digest": "sha256:67fb60ae7112fc5e3a83722070698e9bc425d84f72829323e76efe9a91b403c2",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-imaginer-arbitrer-renovation",
+      "displayName": "Imaginer et arbitrer une rénovation",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-imaginer-arbitrer-renovation.tar.gz",
+      "description": "Skill RenooLab pour transformer une envie, une photo ou un inconfort en scénarios de rénovation comparés avec contraintes, lots et métiers probables.",
+      "capabilities": [
+        "renovation-ideation",
+        "scenario-comparison",
+        "trade-planning"
+      ],
+      "tags": [
+        "agent-skill",
+        "home-improvement",
+        "renovation",
+        "design",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "propose trois scénarios pour moderniser ma petite salle de bain",
+        "comment améliorer le confort thermique de cette maison",
+        "j’hésite entre rénover ma terrasse ou créer un coin piscine"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-imaginer-arbitrer-renovation",
+        "digest": "sha256:3bb442448238d6d7c6bc4c6013c5c4564a419b344ffb8315f8b6ddb5936ebfe4",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-lancer-entreprise-artisanale",
+      "displayName": "Lancer une entreprise artisanale",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-lancer-entreprise-artisanale.tar.gz",
+      "description": "Skill RenooLab pour transformer une reconversion ou un projet artisanal en feuille de route vérifiable : offre, statut, assurances, prix, trésorerie et premiers clients.",
+      "capabilities": [
+        "artisan-business-creation",
+        "legal-readiness",
+        "insurance-planning",
+        "go-to-market"
+      ],
+      "tags": [
+        "agent-skill",
+        "business-creation",
+        "building-trades",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "je veux me mettre à mon compte comme électricien par où commencer",
+        "quel statut et quelles assurances prévoir pour lancer mon activité artisanale",
+        "construis une feuille de route pour trouver mes premiers clients BTP"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-lancer-entreprise-artisanale",
+        "digest": "sha256:4653a7ac298d11f82b12b96729c73e45fd4c2eb7ded8425d05cc6729ee48c19f",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-organiser-chantier-equipe-btp",
+      "displayName": "Organiser un chantier et une équipe BTP",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-organiser-chantier-equipe-btp.tar.gz",
+      "description": "Skill RenooLab pour structurer les rôles, compétences, coûts, recrutements, sous-traitants, approvisionnements et contrôles qualité d’une entreprise du bâtiment.",
+      "capabilities": [
+        "btp-workforce-planning",
+        "subcontracting",
+        "site-operations",
+        "quality-control"
+      ],
+      "tags": [
+        "agent-skill",
+        "construction",
+        "workforce",
+        "operations",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "dois-je embaucher un apprenti ou prendre un sous-traitant",
+        "prépare une fiche de poste pour un compagnon polyvalent",
+        "organise les contrôles qualité et les approvisionnements de ce chantier"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-organiser-chantier-equipe-btp",
+        "digest": "sha256:d772f976df4c82f9c8cd81704fecd4c8a427965b1b0568f9c30d1f0037e1103d",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-piloter-receptionner-travaux",
+      "displayName": "Piloter et réceptionner des travaux",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-piloter-receptionner-travaux.tar.gz",
+      "description": "Skill RenooLab pour coordonner un chantier confié, suivre décisions, délais, paiements et preuves, puis préparer la réception et les réserves.",
+      "capabilities": [
+        "construction-project-management",
+        "worksite-monitoring",
+        "handover",
+        "defect-reserves"
+      ],
+      "tags": [
+        "agent-skill",
+        "construction",
+        "project-management",
+        "handover",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "mon chantier est en retard comment reprendre le contrôle",
+        "prépare ma visite de réception et la liste des réserves",
+        "l’entreprise ne répond plus quelles preuves dois-je rassembler"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-piloter-receptionner-travaux",
+        "digest": "sha256:c7aec2b35607fdecf51047d5edf86f93a8abf159db6000ac2cfb2c1783d7d5a3",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-planifier-budgeter-travaux",
+      "displayName": "Planifier et budgéter des travaux",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-planifier-budgeter-travaux.tar.gz",
+      "description": "Skill RenooLab pour convertir un achat ou un projet de rénovation en risques, cahier des charges, lots, ordre de travaux, budget, aides et prochaines étapes.",
+      "capabilities": [
+        "renovation-planning",
+        "budget-estimation",
+        "work-sequencing",
+        "permit-and-aid-checklist"
+      ],
+      "tags": [
+        "agent-skill",
+        "home-improvement",
+        "budget",
+        "planning",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "combien prévoir pour rénover cette maison et dans quel ordre",
+        "analyse les travaux à anticiper avant d’acheter cet appartement",
+        "quelles aides et autorisations vérifier pour mon projet de rénovation"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-planifier-budgeter-travaux",
+        "digest": "sha256:9793dee4545d65b4ae76ac0a2b4f2ed6fbd14b21451bca4c93ecb5a95447d19d",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:skill:renoolab-trouver-choisir-artisans",
+      "displayName": "Trouver et choisir des artisans",
+      "type": "application/agent-skills+gzip",
+      "url": "https://renoolab.fr/.well-known/agent-skills/packages/v0.5.5/renoolab-trouver-choisir-artisans.tar.gz",
+      "description": "Skill RenooLab pour identifier le bon métier, rechercher réellement des professionnels via le MCP et comparer profils, entreprises, offres ou devis sans inventer de résultat.",
+      "capabilities": [
+        "trade-identification",
+        "tradespeople-search",
+        "provider-comparison",
+        "quote-comparison"
+      ],
+      "tags": [
+        "agent-skill",
+        "local-services",
+        "tradespeople",
+        "renovation",
+        "france",
+        "french"
+      ],
+      "representativeQueries": [
+        "trouve-moi un plombier fiable autour de Marseille",
+        "j’ai une infiltration de toiture quel artisan chercher à Nantes",
+        "compare ces deux devis et les profils des entreprises",
+        "cherche une équipe pour rénover ma salle de bain à Lyon",
+        "je veux choisir un artisan sans passer par une plateforme à commission"
+      ],
+      "version": "0.5.5",
+      "metadata": {
+        "license": "Apache-2.0",
+        "skillName": "renoolab-trouver-choisir-artisans",
+        "digest": "sha256:69bc5e3c576f25ad71502bee5cef1c8e21e72399aac1d2e0feaebda52f22f1aa",
+        "packageFormat": "tar+gzip",
+        "standard": "agentskills.io",
+        "language": "fr-FR",
+        "sourceRepository": "https://github.com/mehdimicra/renoolab-agent-skills"
+      }
+    },
+    {
+      "identifier": "urn:air:renoolab.fr:a2a:find-artisans-france",
+      "displayName": "RenooLab — trouver des artisans en France (A2A)",
+      "type": "application/a2a-agent-card+json",
+      "description": "Agent A2A officiel RenooLab en lecture seule pour trouver en France des artisans du bâtiment par métier et ville. Il déduit un métier unique depuis un problème de bâtiment pris en charge ou traite un chantier multi-métiers déjà confirmé, sans envoi automatique de contact.",
+      "capabilities": [
+        "find_artisans_france"
+      ],
+      "tags": [
+        "a2a",
+        "artisans",
+        "renovation",
+        "building-trades",
+        "problem-to-trade",
+        "france",
+        "french",
+        "multi-trade"
+      ],
+      "representativeQueries": [
+        "trouve-moi un plombier à Lyon",
+        "Une fuite sous mon évier à Marseille",
+        "My electrical panel keeps tripping near Aubagne",
+        "My roof is leaking around Toulon",
+        "je cherche un plombier et un électricien autour de Toulon"
+      ],
+      "version": "1.0.2",
+      "url": "https://a2a.renoolab.fr/.well-known/agent-card.json",
+      "metadata": {
+        "protocol": "A2A",
+        "protocolVersion": "1.0",
+        "agentCardUrl": "https://a2a.renoolab.fr/.well-known/agent-card.json",
+        "executionUrl": "https://a2a.renoolab.fr/a2a",
+        "language": "fr-FR",
+        "geographicCoverage": "France"
+      }
+    }
+  ]
+}

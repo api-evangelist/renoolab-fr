@@ -1,0 +1,64 @@
+generated: '2026-09-19'
+method: searched
+source: https://mcp.renoolab.fr/mcp (resources/list)
+sources:
+- https://mcp.renoolab.fr/mcp (resources/list + tool _meta.ui, 2026-09-19)
+- https://renoolab.fr/webmcp.js
+- https://renoolab.fr/llms.txt ("WebMCP (navigateurs agentiques)", "Application mobile")
+- https://renoolab.fr/ (footer links)
+summary: >-
+  RenooLab publishes no embeddable component library for third-party sites. What it does ship are two agent-facing
+  UI surfaces - an MCP Apps widget rendered inside compatible MCP hosts, and WebMCP tools registered by its own
+  pages for agentic browsers - plus its hosted end-user surfaces (web app, iOS and Android apps, a ChatGPT app listing).
+components:
+- family: mcp-apps-widget
+  name: artisans-widget
+  uri: ui://widget/artisans-v16.html
+  mime_type: text/html;profile=mcp-app
+  official: true
+  description: >-
+    Expandable result cards rendered by MCP Apps-capable hosts (OpenAI outputTemplate) for rechercher_artisans:
+    up to three RenooLab photos per profile, a link to the full web-app profile and a contact path. Opening a card
+    never triggers the write tool. CSP resource domains are the provider's R2 bucket and lh3.googleusercontent.com;
+    redirect domains are app.renoolab.fr, renoolab.fr and Google Maps.
+  compat: ui://widget/artisans-v15.html kept as artisans-widget-v15-compat
+  loader: MCP Apps extension io.modelcontextprotocol/ui (declared at initialize)
+- family: webmcp
+  name: RenooLab WebMCP page tools
+  script: https://renoolab.fr/webmcp.js
+  official: true
+  tools:
+  - rechercher_artisans_renoolab
+  - rechercher_chantier_renoolab
+  - contacter_artisan_renoolab
+  - inscrire_artisan_renoolab
+  description: >-
+    First-party script (36 KB, loaded by renoolab.fr pages) that registers four typed tools with document.modelContext
+    (falling back to navigator.modelContext) under the Chrome WebMCP origin trial. Its header comment states it
+    is a total no-op in browsers without the API, that searches go through the site's same-origin Worker rather
+    than mcp.renoolab.fr, and that both write tools require a visible human confirmation in the page before any
+    byte is sent. Disabled on /contact-professionnel.
+  status: experimental (origin trial); observed signal only in the catalog, not scored
+hosted_surfaces:
+- name: Web application
+  url: https://app.renoolab.fr
+  detail: >-
+    SPA - search by address (all communes, real time) at /search?guest=1, feed at /feed?guest=1, /register, /login
+- name: iOS app
+  url: https://apps.apple.com/app/id6766857661
+  note: >-
+    https://apps.apple.com/app/id6766857661 answered 404 from a US vantage on 2026-09-19 (region-less App Store
+    URL for a France-only listing); the link is the one the homepage publishes
+- name: Android app
+  url: https://play.google.com/store/apps/details?id=com.renoolab.app
+- name: ChatGPT app listing
+  url: https://chatgpt.com/plugins/plugin_asdk_app_6a8ad6ce6340819194c4080a52c1f87f
+  detail: published plugin; install from the listing, no manual MCP URL
+  note: >-
+    403 to an anonymous fetch - requires a ChatGPT session; not verified beyond the provider linking it from the
+    homepage, llms.txt and docs
+- name: Public SEO pages
+  url: https://renoolab.fr/{metier}/{ville}
+  detail: >-
+    trade x city pages with per-profile contact forms usable without an account; /entreprise/{slug} directory pages;
+    index at /villes/ and sitemap.xml

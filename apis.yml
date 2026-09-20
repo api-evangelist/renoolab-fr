@@ -1,18 +1,132 @@
 aid: renoolab-fr
 name: RenooLab
-description: 'RenooLab is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  RenooLab ("le réseau social de la rénovation") is a French marketplace, published by Marseille-based sole
+  trader Mehdi Boukenouche, that connects homeowners with building tradespeople across 19 trades - free for
+  both sides, no commission on jobs, no lead reselling; tradespeople can buy optional in-app Pro/Premium
+  visibility. Its developer surface is agent-native rather than REST: an official remote MCP server at
+  https://mcp.renoolab.fr/mcp (streamable HTTP, protocol 2025-06-18, four tools - two anonymous read-only
+  searches by trade/city or multi-trade project, two OAuth 2.1-gated writes for moderated contact requests and
+  inactive profile creation, with dynamic client registration and PKCE; on the MCP Registry as fr.renoolab/mcp
+  v1.4.0 and in the ChatGPT app directory), a read-only A2A 1.0 agent at https://a2a.renoolab.fr/a2a with its
+  card at /.well-known/agent-card.json, ten provider-published Agent Skills discoverable at
+  /.well-known/agent-skills/index.json, an ARD / ai-catalog federation manifest, WebMCP tools registered
+  in-page via document.modelContext, and an llms.txt. No OpenAPI, SDK or REST reference is published; the
+  tools/list contract is the machine-readable core. Deployment is national with the PACA region first.
+image: https://renoolab.fr/logo-128.webp
 url: https://raw.githubusercontent.com/api-evangelist/renoolab-fr/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
+x-country: FR
+x-headquarters: Marseille, France
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- Home Services
+- Construction
+- Building Trades
+- Renovation
+- Marketplace
+- Local Services
+- MCP
+- A2A
+- AI Agents
+- Agent Skills
+- France
+apis:
+- aid: renoolab-fr:renoolab-mcp-server
+  name: RenooLab MCP Server
+  description: >-
+    Official remote MCP server (streamable HTTP, JSON-RPC 2.0, MCP 2025-06-18, serverInfo renoolab-mcp 1.4.0)
+    exposing four French-language tools over the marketplace: rechercher_artisans (one trade within 30 km of a
+    commune, up to 5 profiles, attributed Google Maps listings when no member is available) and
+    rechercher_chantier (a confirmed multi-trade project within 50 km) are anonymous and read-only;
+    contacter_artisan (a moderated contact request to exactly one selected profile or Place ID) and
+    creer_profil_artisan (an inactive profile activated by e-mail) require an OAuth 2.1 bearer from the
+    provider's own authorization server on the same host (RFC 8414 + RFC 9728 metadata, DCR, PKCE S256, no
+    RenooLab account needed). tools/list answers anonymously with full inputSchema, outputSchema, annotations
+    and per-tool securitySchemes; MCP Apps UI widgets render results in compatible hosts. Listed on the official
+    MCP Registry as fr.renoolab/mcp (v1.4.0, 2026-08-23) with a public metadata repository.
+  image: https://renoolab.fr/logo-128.webp
+  humanURL: https://renoolab.fr/mcp/
+  baseURL: https://mcp.renoolab.fr/mcp
+  tags:
+  - MCP
+  - Building Trades
+  - Local Search
+  - France
+  properties:
+  - type: Documentation
+    url: https://renoolab.fr/mcp/
+  - type: MCPServer
+    url: mcp/renoolab-fr-mcp.yml
+  - type: X-MCPToolsList
+    url: mcp/renoolab-fr-mcp-tools-list.json
+  - type: Authentication
+    url: authentication/renoolab-fr-authentication.yml
+  - type: OAuthScopes
+    url: scopes/renoolab-fr-scopes.yml
+  - type: Conventions
+    url: conventions/renoolab-fr-conventions.yml
+  - type: ErrorCatalog
+    url: errors/renoolab-fr-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/renoolab-fr-rate-limits.yml
+  - type: Plans
+    url: plans/renoolab-fr-plans-pricing.yml
+  - type: Conformance
+    url: conformance/renoolab-fr-conformance.yml
+  - type: Lifecycle
+    url: lifecycle/renoolab-fr-lifecycle.yml
+  - type: ChangeLog
+    url: changelog/renoolab-fr-changelog.yml
+  - type: DataModel
+    url: data-model/renoolab-fr-data-model.yml
+  - type: Components
+    url: components/renoolab-fr-components.yml
+  - type: AgentSkill
+    url: skills/_index.yml
+  - type: GitHubRepository
+    url: https://github.com/mehdimicra/renoolab-mcp
+  overlays: []
+- aid: renoolab-fr:renoolab-a2a-agent
+  name: RenooLab A2A Agent
+  description: >-
+    Read-only Agent2Agent surface: an A2A 1.0 JSON-RPC endpoint at https://a2a.renoolab.fr/a2a whose card
+    (served at /.well-known/agent-card.json on both renoolab.fr and a2a.renoolab.fr, version 1.0.2) declares one
+    skill, find_artisans_france - find building tradespeople in France by trade and city or for a confirmed
+    multi-trade project, inferring a trade from a described problem or asking for clarification. It returns
+    public profiles and contact options, never contacts a professional and writes no business data; it shares
+    the search engine behind the MCP tools. No streaming, push notifications or extended card; anonymous. GET
+    /a2a answers 405 and a JSON-RPC envelope without an A2A version answers -32009 "Version A2A invalide" with
+    a request_id. Graded conformant against A2A 1.0.0 in a2a/renoolab-fr-a2a.yml.
+  image: https://renoolab.fr/logo-128.webp
+  humanURL: https://renoolab.fr/mcp/
+  baseURL: https://a2a.renoolab.fr/a2a
+  tags:
+  - A2A
+  - AI Agents
+  - Building Trades
+  - France
+  properties:
+  - type: Documentation
+    url: https://renoolab.fr/mcp/
+  - type: AgentCard
+    url: a2a/renoolab-fr-a2a.yml
+  - type: Authentication
+    url: authentication/renoolab-fr-authentication.yml
+  - type: Conventions
+    url: conventions/renoolab-fr-conventions.yml
+  - type: ErrorCatalog
+    url: errors/renoolab-fr-problem-types.yml
+  - type: Conformance
+    url: conformance/renoolab-fr-conformance.yml
+  - type: RateLimits
+    url: rate-limits/renoolab-fr-rate-limits.yml
+  overlays: []
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
@@ -21,3 +135,91 @@ maintainers:
 common:
 - type: Website
   url: https://renoolab.fr/
+- type: Documentation
+  url: https://renoolab.fr/mcp/
+- type: LLMsTxt
+  url: llms/renoolab-fr-llms.txt
+- type: LLMsTxt
+  name: llms.txt (provider-hosted)
+  url: https://renoolab.fr/llms.txt
+- type: Blog
+  url: https://renoolab.fr/blog/
+- type: Support
+  url: https://renoolab.fr/support/
+- type: TermsOfService
+  url: https://renoolab.fr/cgu/
+- type: PrivacyPolicy
+  url: https://renoolab.fr/privacy/
+- type: Legal
+  url: https://renoolab.fr/mentions-legales/
+- type: Signup
+  url: https://app.renoolab.fr/register
+- type: Login
+  url: https://app.renoolab.fr/login
+- type: GitHubRepository
+  name: renoolab-mcp (MCP metadata and documentation)
+  url: https://github.com/mehdimicra/renoolab-mcp
+- type: GitHubRepository
+  name: renoolab-agent-skills
+  url: https://github.com/mehdimicra/renoolab-agent-skills
+- type: LinkedIn
+  url: https://www.linkedin.com/company/renoolab
+- type: Instagram
+  url: https://www.instagram.com/renoolab/
+- type: Facebook
+  url: https://www.facebook.com/renoolab
+- type: MCPServer
+  url: mcp/renoolab-fr-mcp.yml
+- type: AgentCard
+  url: a2a/renoolab-fr-a2a.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: WellKnown
+  url: well-known/renoolab-fr-well-known.yml
+- type: AICatalog
+  url: well-known/renoolab-fr-ard.json
+- type: Authentication
+  url: authentication/renoolab-fr-authentication.yml
+- type: OAuthScopes
+  url: scopes/renoolab-fr-scopes.yml
+- type: Conventions
+  url: conventions/renoolab-fr-conventions.yml
+- type: Conformance
+  url: conformance/renoolab-fr-conformance.yml
+- type: Lifecycle
+  url: lifecycle/renoolab-fr-lifecycle.yml
+- type: ChangeLog
+  url: changelog/renoolab-fr-changelog.yml
+- type: RateLimits
+  url: rate-limits/renoolab-fr-rate-limits.yml
+- type: Plans
+  url: plans/renoolab-fr-plans-pricing.yml
+- type: Packages
+  url: packages/renoolab-fr-packages.yml
+- type: Components
+  url: components/renoolab-fr-components.yml
+- type: DataModel
+  url: data-model/renoolab-fr-data-model.yml
+- type: ErrorCatalog
+  url: errors/renoolab-fr-problem-types.yml
+- type: DomainSecurity
+  url: security/renoolab-fr-domain-security.yml
+- type: VulnerabilityDisclosure
+  url: security/renoolab-fr-vulnerability-disclosure.yml
+- type: Security
+  url: https://github.com/mehdimicra/renoolab-mcp/blob/main/SECURITY.md
+- type: X-RegulatoryPosture
+  url: regulatory/renoolab-fr-regulatory-posture.yml
+- type: DataSubjectRequest
+  url: https://renoolab.fr/privacy/
+- type: DataResidency
+  url: https://renoolab.fr/privacy/
+- type: Subprocessors
+  url: https://renoolab.fr/privacy/
+- type: NoticeAndAction
+  url: https://renoolab.fr/cgu/
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 38
+  pass: local-v3

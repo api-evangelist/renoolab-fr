@@ -1,0 +1,97 @@
+generated: '2026-09-19'
+method: derived
+derived_from: mcp/renoolab-fr-mcp-tools-list.json
+probe: true
+docs:
+- https://renoolab.fr/mcp/ ("Résultats honnêtes": explicit dependency and timeout errors)
+- https://github.com/mehdimicra/renoolab-mcp/blob/main/llms-install.md
+format: jsonrpc
+summary: >-
+  RenooLab publishes no error reference and no OpenAPI, so this catalog is derived from what the live MCP and A2A
+  endpoints returned on 2026-09-19 plus the structured NON-error outcomes the tool outputSchemas define. The important
+  convention for an agent is that most "failures" are not errors at all: a missing or ambiguous commune comes back
+  as a normal result of kind search_needs_input, and zero matches is a normal result with an empty list. Transport-level
+  responses on the MCP host are terse (plain-text 404, JSON 401/406).
+problems:
+- status: 200
+  kind: search_needs_input
+  title: Search needs more input (clarification, not an error)
+  detail: >-
+    Returned by rechercher_artisans and rechercher_chantier when the commune is missing or homonymous (ask for ville,
+    code_postal or departement) or when rechercher_chantier receives more than six trades (required_input metiers_prioritaires
+    with metiers_recus). Retry the same tool with the added input.
+  remediation: Ask the user for the missing value; never pick the most populous commune silently.
+  source_operation: >-
+    mcp/renoolab-fr-mcp-tools-list.json#rechercher_artisans, mcp/renoolab-fr-mcp-tools-list.json#rechercher_chantier
+- status: 200
+  kind: artisan_results (empty) / coverage none
+  title: No professional available (valid business result)
+  detail: >-
+    An empty artisans[] or a project coverage of "none" / "partial" is a legitimate outcome; the docs state a zone
+    without offer "n'est pas présentée comme une panne". rechercher_artisans may instead return kind external_grounded_results
+    with attributed Google Maps listings.
+  remediation: Say so plainly; offer to widen the trade or the area.
+  source_operation: mcp/renoolab-fr-mcp-tools-list.json#rechercher_artisans
+- status: 400
+  code: -32009
+  title: Version A2A invalide.
+  detail: >-
+    A2A endpoint rejects a JSON-RPC envelope that does not carry a valid A2A protocol version; error.data.request_id
+    is a UUID for support correlation.
+  observed: POST https://a2a.renoolab.fr/a2a with method agent/getAuthenticatedExtendedCard and no A2A version
+  source_operation: a2a/renoolab-fr-agent-card.json
+- status: 200
+  code: -32601
+  title: Method not found
+  detail: MCP server answers standard JSON-RPC -32601 for unimplemented methods (prompts/list).
+  observed: POST https://mcp.renoolab.fr/mcp prompts/list
+- status: 401
+  title: Unauthorized
+  detail: >-
+    Non-MCP paths on the MCP host (e.g. /mcp/index.md) answer 401 application/json; the write tools require an OAuth
+    2.1 bearer token (see authentication/). The exact JSON-RPC error a write tool returns without a token was not
+    exercised.
+  observed: GET https://mcp.renoolab.fr/mcp/index.md
+  body: '{"error":"invalid_token","error_description":"Missing or invalid access token"}'
+  format: OAuth 2.0 bearer error JSON (RFC 6750 shape)
+- status: 405
+  title: Method Not Allowed
+  detail: >-
+    GET on the A2A endpoint (/a2a) and on the OAuth registration endpoint (/register) - both are POST-only.
+  observed: GET https://a2a.renoolab.fr/a2a, GET https://mcp.renoolab.fr/register
+- status: 400
+  title: invalid_client_metadata (OAuth dynamic client registration)
+  detail: >-
+    POST https://mcp.renoolab.fr/register with an empty JSON object returns an RFC 7591 registration error; at least
+    one redirect URI is required.
+  body: '{"error":"invalid_client_metadata","error_description":"At least one redirect URI is required"}'
+  observed: POST https://mcp.renoolab.fr/register {}
+- status: 406
+  title: Not Acceptable
+  detail: >-
+    GET https://mcp.renoolab.fr/mcp without an Accept header covering text/event-stream; MCP streamable HTTP requires
+    Accept application/json, text/event-stream.
+  observed: GET https://mcp.renoolab.fr/mcp
+  body: >-
+    {"jsonrpc":"2.0","error":{"code":-32000,"message":"Not Acceptable: Client must accept text/event-stream"},"id":null}
+  code: -32000
+- status: 404
+  title: Not found
+  detail: >-
+    Unknown paths answer 404 text/plain "Not found" on mcp.renoolab.fr and 404 application/json on a2a.renoolab.fr;
+    renoolab.fr serves an HTML 404 page; app.renoolab.fr answers 200 with the SPA shell for every path. The A2A
+    host answers unknown routes with a JSON-RPC error: {"jsonrpc":"2.0","id":null,"error":{"code":-32601,"message":"Route
+    introuvable.","data":{"request_id":"<uuid>"}}}.
+- status: 429
+  title: Quota exceeded (behaviour documented, format not)
+  detail: >-
+    Documented quotas - 10 distinct artisans per 6 h per e-mail/phone, 1 request per artisan per 24 h, 10 profile-creation
+    attempts per 24 h per actor - are enforced server-side ("quotas atomiques et anti-doublon"); the docs promise
+    explicit errors but publish no code or shape. Recorded as documented behaviour with an unverified status code.
+  source: https://renoolab.fr/mcp/
+- status: 5xx
+  title: Dependency or timeout error (documented, shape unpublished)
+  detail: >-
+    The docs commit that "les erreurs de dépendance et délais dépassés sont explicites"; no code or schema is published
+    and none was observed.
+  source: https://renoolab.fr/mcp/

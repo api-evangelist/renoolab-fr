@@ -1,0 +1,130 @@
+generated: '2026-09-19'
+method: searched
+source: https://mcp.renoolab.fr/mcp
+sources:
+- https://mcp.renoolab.fr/.well-known/oauth-authorization-server
+- https://mcp.renoolab.fr/.well-known/oauth-protected-resource
+- https://renoolab.fr/.well-known/agent-card.json
+- https://renoolab.fr/.well-known/agent-skills/index.json
+- https://renoolab.fr/.well-known/ard.json
+- https://renoolab.fr/webmcp.js
+- https://renoolab.fr/mcp/
+summary: >-
+  RenooLab's conformance profile is the agent-protocol stack, observed live rather than claimed: MCP at
+  protocol version 2025-06-18 over streamable HTTP with the MCP Apps UI and Skills extensions, OAuth 2.1
+  (authorization code + PKCE S256 + refresh tokens) with RFC 8414 authorization-server metadata, RFC 9728
+  protected-resource metadata and RFC 7591 dynamic client registration on the MCP host, an A2A 1.0 agent card
+  and JSON-RPC endpoint, an agentskills.io discovery index with sha256-digested archives, an ARD 1.0 federation
+  manifest, WebMCP tools registered in-page via document.modelContext, and an llms.txt. It publishes no OpenAPI,
+  no OIDC discovery, no RFC 9116 security.txt, no RFC 9727 API catalog, no APIs.json, no RFC 9457 problem
+  details and no RFC 8594 sunset signalling. There is no sector interoperability standard for a
+  building-trades marketplace to declare; the one identifier scheme in the contract (SIRET, verified against the
+  French SIRENE register) is a national business identifier, not a domain data standard, and is recorded
+  without claiming a domain-standard signature.
+standards:
+- id: mcp
+  name: Model Context Protocol
+  version: '2025-06-18'
+  conforms: true
+  evidence: 'POST https://mcp.renoolab.fr/mcp initialize -> protocolVersion "2025-06-18", serverInfo {renoolab-mcp, 1.4.0}, capabilities {tools: {listChanged: true}, resources: {listChanged: true}, extensions: {io.modelcontextprotocol/ui, io.modelcontextprotocol/skills}}; tools/list -> 4 tools with JSON Schema draft-07 inputSchema + outputSchema, annotations, execution.taskSupport and _meta.securitySchemes; resources/list -> 2 MCP Apps UI resources. Saved: mcp/renoolab-fr-mcp-tools-list.json.'
+- id: mcp-apps-ui
+  name: MCP Apps UI extension (io.modelcontextprotocol/ui)
+  conforms: true
+  evidence: 'initialize capabilities.extensions declares io.modelcontextprotocol/ui; resources/list returns ui://widget/artisans-v16.html and ui://widget/artisans-v15.html with mimeType text/html;profile=mcp-app and _meta.ui.csp; rechercher_artisans _meta.ui.resourceUri and openai/outputTemplate point at the v16 widget.'
+- id: mcp-registry
+  name: Official MCP Registry server.json (2025-12-11 schema)
+  conforms: true
+  evidence: 'registry.modelcontextprotocol.io lists fr.renoolab/mcp, 5 active versions 1.0.0 (2026-07-06) -> 1.4.0 (2026-08-23, isLatest), remotes [{streamable-http, https://mcp.renoolab.fr/mcp}]; server.json in github.com/mehdimicra/renoolab-mcp carries the same $schema and content.'
+- id: json-rpc-2.0
+  conforms: true
+  evidence: 'Both /mcp and /a2a answer {"jsonrpc":"2.0", ...}; /mcp returns -32601 Method not found for prompts/list; /a2a returns -32009 "Version A2A invalide." with data.request_id for an envelope without an A2A version.'
+- id: oauth2.1
+  name: OAuth 2.1 (authorization code + PKCE, refresh tokens, no implicit/password)
+  conforms: true
+  evidence: 'well-known/renoolab-fr-oauth-authorization-server.json: response_types_supported [code], grant_types_supported [authorization_code, refresh_token], code_challenge_methods_supported [S256], token_endpoint_auth_methods_supported [client_secret_basic, client_secret_post, none], revocation_endpoint; https://renoolab.fr/mcp/ states "OAuth 2.1, enregistrement dynamique du client et PKCE S256". Token lifetimes published in the privacy policy §5: access token 1 h, refresh token 30 days, dynamic client 90 days, consent session 10 min.'
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: GET https://mcp.renoolab.fr/.well-known/oauth-authorization-server -> 200 application/json, issuer https://mcp.renoolab.fr (saved verbatim in well-known/).
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence: 'GET https://mcp.renoolab.fr/.well-known/oauth-protected-resource -> 200 application/json {resource: https://mcp.renoolab.fr, authorization_servers: [https://mcp.renoolab.fr], bearer_methods_supported: [header]} (saved verbatim in well-known/).'
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration
+  conforms: true
+  verification: partial
+  evidence: 'registration_endpoint https://mcp.renoolab.fr/register advertised in the AS metadata and documented on https://renoolab.fr/mcp/ ("enregistrement dynamique du client"); GET /register -> 405, so the route exists. No registration was performed by this pipeline.'
+- id: rfc7636
+  name: PKCE
+  conforms: true
+  evidence: code_challenge_methods_supported [S256] in the AS metadata; docs state PKCE S256.
+- id: rfc6750
+  name: Bearer token usage
+  conforms: true
+  evidence: bearer_methods_supported [header] in the protected-resource metadata.
+- id: a2a
+  name: Agent2Agent protocol
+  version: '1.0'
+  conforms: true
+  evidence: 'a2a/renoolab-fr-agent-card.json served at /.well-known/agent-card.json on renoolab.fr and a2a.renoolab.fr - supportedInterfaces[0] {url https://a2a.renoolab.fr/a2a, protocolBinding JSONRPC, protocolVersion "1.0"}, capabilities object, skills array (1), default input/output modes; POST /a2a answers JSON-RPC with A2A error -32009 for an invalid version. Graded conformant in a2a/renoolab-fr-a2a.yml.'
+- id: agent-skills
+  name: Agent Skills specification (agentskills.io) + discovery 0.2.0
+  conforms: true
+  evidence: 'https://renoolab.fr/.well-known/agent-skills/index.json declares $schema https://schemas.agentskills.io/discovery/0.2.0/schema.json with 10 archive entries (url + sha256 digest); all 10 tar.gz fetched, digests verified, each containing SKILL.md with name/description/license frontmatter. Saved verbatim under skills/.'
+- id: ard
+  name: Agent Registry Discovery manifest (specVersion 1.0)
+  conforms: true
+  evidence: 'https://renoolab.fr/.well-known/ard.json (and the identical /.well-known/ai-catalog.json): specVersion "1.0", host {displayName, identifier renoolab.fr, documentationUrl}, 12 entries typed application/mcp-server+json, application/agent-skills+gzip and application/a2a-agent-card+json, each with identifier URN urn:air:renoolab.fr:..., capabilities, tags, representativeQueries and metadata.'
+- id: webmcp
+  name: WebMCP (W3C Web ML CG draft; Chrome origin trial)
+  conforms: true
+  verification: script-level
+  evidence: 'https://renoolab.fr/webmcp.js (200 application/javascript, 36,069 bytes, loaded by the homepage) resolves document.modelContext ?? navigator.modelContext and calls registerTool for rechercher_artisans_renoolab, rechercher_chantier_renoolab, contacter_artisan_renoolab and inscrire_artisan_renoolab in the same script; its header comment states the script is a no-op without the API and that the in-page tools call the site''s same-origin Worker. Listed in llms.txt under "WebMCP (navigateurs agentiques)". The catalog treats WebMCP as an observed, unscored signal.'
+- id: llms-txt
+  conforms: true
+  evidence: https://renoolab.fr/llms.txt -> 200 text/markdown, H1 + blockquote + sectioned link lists (saved in llms/).
+- id: siret-sirene
+  name: SIRET business identifier (INSEE SIRENE register)
+  kind: identifier-scheme
+  conforms: true
+  domain_standard_signature: false
+  evidence: 'creer_profil_artisan inputSchema.siret: pattern ^\d{14}$, "s''il est fourni, il est vérifié au registre SIRENE"; CGU §9 verified badge = SIREN validity + professional insurance.'
+  note: A national business-registry identifier carried in the contract, not a sector interoperability standard; recorded for completeness, no domain-standard credit claimed.
+- id: openapi
+  conforms: false
+  evidence: 'No OpenAPI on renoolab.fr, app.renoolab.fr, mcp.renoolab.fr or a2a.renoolab.fr (/openapi.json, /openapi.yaml, /swagger.json, /api-docs, /docs all 404 or SPA shell); the provider states no REST reference exists - the MCP tools/list is the machine-readable contract.'
+- id: oidc
+  conforms: false
+  evidence: /.well-known/openid-configuration 404 on renoolab.fr, mcp.renoolab.fr and a2a.renoolab.fr; the AS is a plain OAuth 2.1 issuer without an id_token.
+- id: rfc9116-security-txt
+  conforms: false
+  evidence: /.well-known/security.txt 404 on every host (renoolab.fr, www, mcp, a2a; SPA shell on app).
+- id: rfc9727-api-catalog
+  conforms: false
+  evidence: /.well-known/api-catalog and api-catalog.json 404 on every host.
+- id: apis-json
+  conforms: false
+  evidence: /apis.json, /apis.yml and /.well-known/apis.json 404 on every host.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: Errors are JSON-RPC error objects (MCP, A2A) and plain-text/JSON 404 bodies; no application/problem+json observed.
+- id: rfc8594-sunset
+  conforms: false
+  evidence: No Sunset or Deprecation headers observed; no deprecation policy published (lifecycle/renoolab-fr-lifecycle.yml).
+- id: aauth
+  conforms: false
+  evidence: /.well-known/aauth-resource.json 404 on renoolab.fr, mcp.renoolab.fr and a2a.renoolab.fr.
+- id: ucp
+  conforms: false
+  evidence: /.well-known/ucp.json 404 on every host.
+- id: acp
+  conforms: false
+  evidence: /.well-known/acp.json 404 on every host.
+domain_standard:
+  sector: home services / building-trades marketplace (France)
+  applicable_standard: none identified
+  note: >-
+    No cross-provider data standard exists for tradesperson marketplaces to declare (no equivalent of SCIM,
+    OData, FHIR or OpenRTB); the Kin Score domain_standard_conformance check is reward-only, so nothing is
+    asserted here.

@@ -1,0 +1,64 @@
+generated: '2026-09-19'
+method: searched
+source: https://registry.modelcontextprotocol.io/v0/servers?search=fr.renoolab%2Fmcp
+sources:
+- https://registry.modelcontextprotocol.io/v0/servers?search=fr.renoolab%2Fmcp
+- https://api.github.com/repos/mehdimicra/renoolab-agent-skills/releases
+- https://github.com/mehdimicra/renoolab-mcp (README "Contract provenance")
+- https://renoolab.fr/llms.txt
+source_detail: >-
+  RenooLab publishes no dated changelog page (https://renoolab.fr/changelog 404; none linked from the docs
+  or llms.txt). The release record that exists is the version history the provider itself pushed to two
+  public registries: the official MCP Registry (five versions of fr.renoolab/mcp, each with a publishedAt
+  timestamp and the remote URL of the day) and GitHub Releases on the Agent Skills repository (ten tags).
+  Entries below are reconstructed from those timestamps plus the provider's own descriptions; where the
+  registry description changed between versions that change is quoted. No commit-level detail is claimed.
+scheme:
+  mcp_server: semver (registry version = serverInfo.version)
+  agent_skills: semver git tags vX.Y.Z; archives published under /.well-known/agent-skills/packages/vX.Y.Z/
+current_version:
+  mcp_server: 1.4.0
+  agent_skills: 0.5.5
+dated_releases_published: true
+entries:
+- version: mcp 1.4.0
+  date: '2026-08-23'
+  kind: additions
+  highlights:
+  - 'Registry description becomes "Find French tradespeople, plan multi-trade projects, submit moderated contacts, create profiles" - the four-tool contract (rechercher_artisans, rechercher_chantier, contacter_artisan, creer_profil_artisan).'
+  - Provider publishes schemas/mcp-tools-v1.4.0.json, a hashed snapshot of the live tools/list captured the same day, in the metadata repo.
+  - 'Live server on 2026-09-19 still reports 1.4.0 with Grounding enabled: rechercher_artisans may return attributed Google Maps listings (openWorldHint true) and contacter_artisan accepts an external_place_id target.'
+- version: skills 0.5.5
+  date: '2026-08-23'
+  kind: additions
+  highlights:
+  - 'Release "RenooLab Agent Skills v0.5.5": 10 skills / 29 intents; Microsoft 365 Copilot Cowork package (manifest 1.28, 10 skills + remote MCP connector) and Perplexity ZIP added; llms.txt notes the remote MCP "publie désormais son contrat courant à quatre outils".'
+- version: mcp 1.2.1
+  date: '2026-08-13'
+  kind: fix
+  highlights: [Patch release on the registry; no public notes.]
+- version: skills 0.5.3
+  date: '2026-08-11'
+  kind: additions
+  highlights: ['Kiro "Power" portable Agent Plugins distribution (design + implementation plans dated 2026-08-11 in docs/superpowers/).']
+- version: skills 0.5.0 - 0.5.2
+  date: '2026-08-10'
+  kind: additions
+  highlights: [Three same-day releases; collection re-cut on the 0.5 line.]
+- version: mcp 1.2.0
+  date: '2026-08-08'
+  kind: additions
+  highlights:
+  - 'Registry entry gains a repository link (github.com/mehdimicra/renoolab-mcp, created the same day), an icon and the title "RenooLab - artisans in France"; description becomes "Find and contact plumbers, electricians, roofers and tradespeople in France; free pro profiles."'
+- version: skills 0.3.0 - 0.4.2
+  date: '2026-07-31'
+  kind: initial
+  highlights: [Agent Skills repository created and five releases cut on the first day.]
+- version: mcp 1.1.0
+  date: '2026-07-15'
+  kind: breaking
+  highlights: ['Remote moves from https://renoolab-mcp.mehdi-boukenouche.workers.dev/mcp to the custom domain https://mcp.renoolab.fr/mcp; websiteUrl becomes https://renoolab.fr/mcp/.']
+- version: mcp 1.0.0
+  date: '2026-07-06'
+  kind: initial
+  highlights: ['First registry publication: "Trouver et contacter des artisans du batiment en France. Gratuit, sans commission." on a Cloudflare Workers hostname.']

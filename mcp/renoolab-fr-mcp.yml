@@ -1,0 +1,147 @@
+generated: '2026-09-19'
+method: searched
+status: published
+source: https://renoolab.fr/.well-known/mcp.json
+sources:
+- https://renoolab.fr/.well-known/mcp.json
+- https://mcp.renoolab.fr/mcp (live initialize + tools/list + resources/list, 2026-09-19)
+- https://renoolab.fr/mcp/ and https://renoolab.fr/mcp/index.md
+- https://registry.modelcontextprotocol.io/v0/servers?search=fr.renoolab%2Fmcp
+- https://github.com/mehdimicra/renoolab-mcp
+- https://renoolab.fr/.well-known/ard.json
+- https://renoolab.fr/llms.txt
+description: >-
+  RenooLab operates an official remote MCP server at https://mcp.renoolab.fr/mcp (streamable HTTP, JSON-RPC
+  2.0, MCP protocol 2025-06-18) exposing four tools over its French building-tradespeople marketplace: two
+  anonymous read-only searches (rechercher_artisans - one trade within 30 km of a commune, up to 5 profiles,
+  may return attributed Google Maps listings when no member is available; rechercher_chantier - a confirmed
+  multi-trade project within 50 km, complete providers or a minimal combination) and two OAuth 2.1-gated
+  writes (contacter_artisan - a moderated contact request to exactly one selected RenooLab profile or
+  external Place ID, held for human validation; creer_profil_artisan - an inactive professional profile that
+  only the e-mail holder can activate). tools/list answered anonymously with a full JSON Schema draft-07
+  inputSchema AND outputSchema per tool, MCP annotations (readOnlyHint / destructiveHint / idempotentHint /
+  openWorldHint), execution.taskSupport and per-tool _meta.securitySchemes; the verbatim result is saved
+  alongside as renoolab-fr-mcp-tools-list.json and is the provider's machine-readable contract - no OpenAPI
+  is published. The server card at /.well-known/mcp.json, the ARD catalog, the MCP Registry listing
+  fr.renoolab/mcp v1.4.0 (2026-08-23), the GitHub metadata repo and the live serverInfo (renoolab-mcp
+  1.4.0) all agree on the endpoint and the tool set.
+deployment:
+  mode: remote
+  endpoint: https://mcp.renoolab.fr/mcp
+  transport: streamable-http
+  install: ''
+  package: ''
+  auth: oauth
+  auth_detail: >-
+    Mixed by tool, declared per tool in _meta.securitySchemes: rechercher_artisans and rechercher_chantier
+    are {type: noauth} and answered tools/list anonymously; contacter_artisan and creer_profil_artisan are
+    {type: oauth2, scopes: []}. The host publishes RFC 9728 protected-resource metadata and RFC 8414
+    authorization-server metadata (issuer https://mcp.renoolab.fr, authorization_code + refresh_token, PKCE
+    S256, dynamic client registration at /register, token_endpoint_auth_methods incl. none). The docs state
+    no RenooLab account is required to complete the OAuth consent.
+  verified: probed
+  probed:
+    initialize: '200 text/event-stream - protocolVersion 2025-06-18, serverInfo {renoolab-mcp, 1.4.0}'
+    tools/list: '200 - 4 tools with inputSchema, outputSchema, annotations, securitySchemes'
+    resources/list: '200 - 2 MCP Apps UI resources (ui://widget/artisans-v16.html, ui://widget/artisans-v15.html; text/html;profile=mcp-app)'
+    prompts/list: 'JSON-RPC -32601 Method not found'
+    GET /mcp: '406 application/json (Accept must include text/event-stream)'
+    GET /sse: '404 (no legacy SSE transport)'
+    GET /register: '405; GET /authorize: 400 (endpoints exist, need proper OAuth request)'
+  headers_of_note: [access-control-allow-origin: '*', access-control-expose-headers: mcp-session-id, server: cloudflare]
+server:
+  name: renoolab-mcp
+  title: RenooLab - artisans in France
+  version: 1.4.0
+  transport: streamable-http
+  url: https://mcp.renoolab.fr/mcp
+  protocol_version: '2025-06-18'
+  session_header: mcp-session-id
+  capabilities_declared:
+    tools: {listChanged: true}
+    resources: {listChanged: true}
+    extensions: ['io.modelcontextprotocol/ui', 'io.modelcontextprotocol/skills']
+  instructions_published: true
+  instructions_summary: >-
+    Server-supplied instructions (French) tell the client to infer a single trade and call rechercher_artisans,
+    to call rechercher_chantier exactly once for a multi-trade project, to ask for the commune / postal code
+    / department when missing or ambiguous, never to use RenooLab for DIY advice or supplier searches, to
+    search before contacting, and to collect name, e-mail, French 06/07 mobile and message, recap the
+    target, and obtain an explicit confirmation before calling contacter_artisan.
+  server_card: well-known/renoolab-fr-mcp.json
+  protected_resource: well-known/renoolab-fr-oauth-protected-resource.json
+  authorization_server: well-known/renoolab-fr-oauth-authorization-server.json
+  tools_list_file: mcp/renoolab-fr-mcp-tools-list.json
+  language: fr-FR (tool names, descriptions and enum values are French; the README and registry entry are English)
+  registry_listing:
+    registry: https://registry.modelcontextprotocol.io
+    name: fr.renoolab/mcp
+    latest_version: 1.4.0
+    published: '2026-08-23'
+    status: active
+    remotes: [{type: streamable-http, url: 'https://mcp.renoolab.fr/mcp'}]
+    repository: https://github.com/mehdimicra/renoolab-mcp
+    history:
+    - {version: 1.0.0, published: '2026-07-06', remote: 'https://renoolab-mcp.mehdi-boukenouche.workers.dev/mcp', note: original Cloudflare Workers hostname}
+    - {version: 1.1.0, published: '2026-07-15', remote: 'https://mcp.renoolab.fr/mcp'}
+    - {version: 1.2.0, published: '2026-08-08', remote: 'https://mcp.renoolab.fr/mcp'}
+    - {version: 1.2.1, published: '2026-08-13', remote: 'https://mcp.renoolab.fr/mcp'}
+    - {version: 1.4.0, published: '2026-08-23', remote: 'https://mcp.renoolab.fr/mcp'}
+  other_listings:
+  - {name: ChatGPT app directory, url: 'https://chatgpt.com/plugins/plugin_asdk_app_6a8ad6ce6340819194c4080a52c1f87f', note: linked from the homepage footer and llms.txt; not fetched (requires a ChatGPT session)}
+  - {name: LobeHub marketplace owner manifest, file: lhm.plugin.json in the GitHub metadata repo}
+  - {name: Kiro one-click add, url: 'https://kiro.dev/launch/mcp/add?name=RenooLab&config=...', note: 'pre-fills the remote endpoint with autoApprove []'}
+  - {name: Cline install guide, url: 'https://github.com/mehdimicra/renoolab-mcp/blob/main/llms-install.md'}
+tools:
+- name: rechercher_artisans
+  title: Trouver un artisan pour des travaux en France
+  effect: read-only
+  annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true}
+  auth: noauth
+  inputs: [besoin, metier, ville, code_postal, departement, tracking]
+  required: []
+  output_kinds: [artisan_results, search_needs_input, external_grounded_results]
+  ui: ui://widget/artisans-v16.html (MCP Apps widget; openai/outputTemplate)
+- name: rechercher_chantier
+  title: Trouver les artisans pour un chantier en France
+  effect: read-only
+  annotations: {readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+  auth: noauth
+  inputs: [ville, metiers_confirmes, code_postal, departement, tracking]
+  required: [ville, metiers_confirmes]
+  output_kinds: [chantier_results, search_needs_input]
+- name: contacter_artisan
+  title: Contacter un professionnel via RenooLab
+  effect: write - moderated contact request, explicit user confirmation required
+  annotations: {readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false}
+  auth: oauth2
+  inputs: [artisan_id | external_place_id (exactly one, enforced by oneOf), nom, email, telephone, message]
+  required: [nom, email, telephone, message]
+  output_kinds: [contact_pending]
+- name: creer_profil_artisan
+  title: Inscrire un artisan ou une entreprise du bâtiment
+  effect: write - creates an inactive profile, activation by e-mail
+  annotations: {readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true}
+  auth: oauth2
+  inputs: [nom_entreprise, siret, metiers, ville, email, telephone, bio]
+  required: [nom_entreprise, metiers, ville, email, telephone]
+  output_kinds: [signup_created]
+tool_count: 4
+resources:
+- {uri: 'ui://widget/artisans-v16.html', name: artisans-widget, mimeType: 'text/html;profile=mcp-app'}
+- {uri: 'ui://widget/artisans-v15.html', name: artisans-widget-v15-compat, mimeType: 'text/html;profile=mcp-app'}
+related_surfaces:
+  a2a: a2a/renoolab-fr-a2a.yml (read-only agent at https://a2a.renoolab.fr/a2a sharing the same search engine)
+  webmcp: >-
+    https://renoolab.fr/webmcp.js registers rechercher_artisans_renoolab, rechercher_chantier_renoolab,
+    contacter_artisan_renoolab and inscrire_artisan_renoolab with document.modelContext (Chrome WebMCP origin
+    trial); per its own header comment the in-page tools call the site's same-origin Worker, not
+    mcp.renoolab.fr. See components/renoolab-fr-components.yml.
+  agent_skills: skills/_index.yml (10 provider-published Agent Skills that route to these tools)
+  catalog: well-known/renoolab-fr-ard.json (ARD 1.0 federation manifest listing the MCP server, the 10 skills and the A2A card)
+  public_contract_snapshot: https://github.com/mehdimicra/renoolab-mcp/blob/main/schemas/mcp-tools-v1.4.0.json (provider's own sanitized, hashed snapshot of the 1.4.0 tools/list, captured 2026-08-23)
+x-evidence:
+  fetched: '2026-09-19'
+  endpoint: https://mcp.renoolab.fr/mcp
+  tools_list_http_status: 200
+  tools_list_content_type: text/event-stream
