@@ -13,6 +13,22 @@ description: >-
   /.well-known/agent-skills/index.json, an ARD / ai-catalog federation manifest, WebMCP tools registered
   in-page via document.modelContext, and an llms.txt. No OpenAPI, SDK or REST reference is published; the
   tools/list contract is the machine-readable core. Deployment is national with the PACA region first.
+deliveryModel:
+  model: saas
+  license_evidence:
+    not_product:
+    - mehdimicra/renoolab-agent-skills
+    - mehdimicra/renoolab-mcp
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: low
+  source:
+  - pricing
+  - repository-not-product
+  generated: '2026-09-25'
+  method: derived
 image: https://renoolab.fr/logo-128.webp
 url: https://raw.githubusercontent.com/api-evangelist/renoolab-fr/refs/heads/main/apis.yml
 x-type: company
@@ -223,3 +239,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 38
   pass: local-v3
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://renoolab.fr/.well-known/agent-card.json"
+  grade: "flavored"
+  protocol_version: "1.0"
+  control: 404
