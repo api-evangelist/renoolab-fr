@@ -149,6 +149,8 @@ maintainers:
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: Pricing
+  url: https://renoolab.fr/artisans/
 - type: Website
   url: https://renoolab.fr/
 - type: Documentation
