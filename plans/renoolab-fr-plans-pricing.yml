@@ -57,3 +57,38 @@ plans:
 free_tier: true
 contact_sales: false
 agent_access_pricing: free, no account, no key; OAuth consent only for the two write tools
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - free
+  units: []
+  plans:
+  - name: Particulier (homeowner)
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Artisan - profil gratuit
+    access: other
+    model: free
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Artisan Pro
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods:
+    - other
+  - name: Artisan Premium
+    access: other
+    model: unstated
+    model_how: derived
+    units: []
+    periods:
+    - other
