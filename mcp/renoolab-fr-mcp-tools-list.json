@@ -1,4 +1,12 @@
 {
+  "endpoint": "https://mcp.renoolab.fr/mcp",
+  "captured": "2026-10-20",
+  "method": "initialize + tools/list (anonymous, no tool called; roadmap#992)",
+  "protocol_version": "2025-06-18",
+  "server_info": {
+    "name": "renoolab-mcp",
+    "version": "1.4.0"
+  },
   "result": {
     "tools": [
       {
@@ -2732,7 +2740,5 @@
         ]
       }
     ]
-  },
-  "jsonrpc": "2.0",
-  "id": 1
+  }
 }
