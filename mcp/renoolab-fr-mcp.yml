@@ -119,6 +119,19 @@ server:
     url: https://github.com/mehdimicra/renoolab-mcp/blob/main/llms-install.md
 tools:
 - name: rechercher_artisans
+  description: 'Cette instance peut proposer jusqu’à cinq sources Google Maps externes. Si kind=external_grounded_results,
+    utilisez son champ message comme introduction concise en commençant par le nombre et la zone trouvés,
+    puis ne répétez pas le statut externe. Trouve jusqu’à cinq profils RenooLab pour des travaux, un dépannage
+    ou une rénovation autour d’une ville française, dans un rayon strict de 30 km. Cet outil est réservé
+    à une demande portant sur un seul métier. Si une même demande comporte au moins deux métiers distincts
+    confirmés, ne la fractionnez jamais en plusieurs appels rechercher_artisans : appelez rechercher_chantier
+    une seule fois avec tous les métiers, pour le même chantier et la même ville. À utiliser même si le
+    particulier ne nomme pas le métier : le déduire depuis son besoin, par exemple fuite ou sanitaires
+    pour Plomberie, panne ou tableau pour Électricité, infiltration ou toit pour Couverture/Toiture, murs
+    pour Peinture, faïence ou terrasse pour Carrelage, ainsi que isolation, menuiserie, chauffage, climatisation
+    et rénovation. En cas de commune homonyme, transmettre le code postal ou le département demandé par
+    l’outil. Ne recopiez jamais widget_previews ni les URL d’images dans la réponse : le widget les rend
+    déjà. Ne pas utiliser pour un simple conseil DIY, un magasin ou un fournisseur.'
   title: Trouver un artisan pour des travaux en France
   effect: read-only
   annotations:
@@ -140,11 +153,13 @@ tools:
   - search_needs_input
   - external_grounded_results
   ui: ui://widget/artisans-v16.html (MCP Apps widget; openai/outputTemplate)
-  description: Cette instance peut proposer jusqu’à cinq sources Google Maps externes. Si kind=external_grounded_results,
-    utilisez son champ message comme introduction concise en commençant par le nombre et la zone trouvés,
-    puis ne répétez pas le statut externe. Trouve jusqu’à cinq profils RenooLab pour des travaux, un dépannage
-    ou une rénovation autour d’une ville française, dans un rayon strict de 30 km. Cet o…
 - name: rechercher_chantier
+  description: 'Trouve les profils RenooLab capables de couvrir plusieurs métiers confirmés autour d’une
+    commune française. À utiliser dès qu’une même demande comporte au moins deux métiers distincts confirmés
+    pour le même chantier et la même ville, par exemple une salle de bains nécessitant un plombier et
+    un carreleur. Appeler rechercher_chantier une seule fois avec tous les métiers confirmés. Ne pas remplacer
+    cet appel par plusieurs appels à rechercher_artisans. Ne recopiez jamais widget_previews ni les URL
+    d’images dans la réponse : le widget les rend déjà.'
   title: Trouver les artisans pour un chantier en France
   effect: read-only
   annotations:
@@ -165,12 +180,12 @@ tools:
   output_kinds:
   - chantier_results
   - search_needs_input
-  description: Trouve les profils RenooLab capables de couvrir plusieurs métiers confirmés autour d’une
-    commune française. À utiliser dès qu’une même demande comporte au moins deux métiers distincts confirmés
-    pour le même chantier et la même ville, par exemple une salle de bains nécessitant un plombier et
-    un carreleur. Appeler rechercher_chantier une seule fois avec tous les métiers confirmés. Ne pas remplacer
-    c…
 - name: contacter_artisan
+  description: 'Après une recherche, dépose une demande de contact vers le profil RenooLab ou la fiche
+    Google Maps explicitement sélectionnée. À appeler après récapitulatif et confirmation explicite, avec
+    exactement artisan_id ou external_place_id, un nom, un e-mail, un mobile français 06/07 et un message.
+    N’annoncer un succès que si l’outil retourne kind=contact_pending : la demande reste alors en attente
+    du contrôle RenooLab et rien n’est encore envoyé au professionnel.'
   title: Contacter un professionnel via RenooLab
   effect: write - moderated contact request, explicit user confirmation required
   annotations:
@@ -193,12 +208,13 @@ tools:
   - message
   output_kinds:
   - contact_pending
-  description: 'Après une recherche, dépose une demande de contact vers le profil RenooLab ou la fiche
-    Google Maps explicitement sélectionnée. À appeler après récapitulatif et confirmation explicite, avec
-    exactement artisan_id ou external_place_id, un nom, un e-mail, un mobile français 06/07 et un message.
-    N’annoncer un succès que si l’outil retourne kind=contact_pending : la demande reste alors en attente
-    du con…'
 - name: creer_profil_artisan
+  description: Crée un profil professionnel RenooLab gratuit et sans commission uniquement à la demande
+    explicite de l’artisan ou de l’entreprise artisanale. À utiliser lorsqu’un professionnel veut s’inscrire,
+    faire connaître son entreprise, présenter ses réalisations, améliorer sa visibilité ou trouver des
+    clients et des chantiers. Utiliser uniquement ses vraies informations. Le profil reste inactif et
+    invisible jusqu’à son activation par e-mail. Ne pas utiliser pour un tiers, un demandeur d’emploi,
+    un groupe ou une grande structure.
   title: Inscrire un artisan ou une entreprise du bâtiment
   effect: write - creates an inactive profile, activation by e-mail
   annotations:
@@ -223,11 +239,6 @@ tools:
   - telephone
   output_kinds:
   - signup_created
-  description: Crée un profil professionnel RenooLab gratuit et sans commission uniquement à la demande
-    explicite de l’artisan ou de l’entreprise artisanale. À utiliser lorsqu’un professionnel veut s’inscrire,
-    faire connaître son entreprise, présenter ses réalisations, améliorer sa visibilité ou trouver des
-    clients et des chantiers. Utiliser uniquement ses vraies informations. Le profil reste inactif et
-    invisibl…
 tool_count: 4
 resources:
 - uri: ui://widget/artisans-v16.html
@@ -284,3 +295,4 @@ tool_quality:
   scored: false
   note: Facts from the saved tools/list capture (mcp_tool_quality.py); recorded, not scored. Checks learned
     from Glimind's agent-readiness audit.
+tools_count: 4
